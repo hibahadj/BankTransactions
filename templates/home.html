@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- Load static files -->
+  {% load static %}
+
+  <title>Home Page</title>
+
+  <style>
+    /* Custom styles */
+    .navbar-custom {
+      background-color: #11216f; 
+    }
+    .navbar-custom .navbar-brand {
+      color: #ffffff; /* White color for the logo text */
+    }
+    .navbar-custom .navbar-nav .nav-link {
+      color: #ffffff; 
+    }
+    .navbar-custom .navbar-nav .nav-link:hover {
+      color: #d3d3d3; 
+    }
+    .btn-logout {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+      background-color: #003366;
+    }
+    .btn-logout:hover {
+      background-color: #002244;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <a class="navbar-brand" href="#">
+      <img src="{% static 'images/logo_cpa1.png' %}" alt="Logo" style="height: 40px;">
+    </a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <!-- Add other nav items here if needed -->
+      </ul>
+      <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mt-4">
+    <h1>Home Page</h1>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
