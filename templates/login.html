@@ -1,160 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Design by foolishdeveloper.com -->
-    <title>Login Page</title>
-
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
-    <!--Stylesheet-->
-    <style media="screen">
-      *,
-*:before,
-*:after{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-}
-body{
-    background-color: #0d1956;
-}
-.background{
-    width: 430px;
-    height: 520px;
-    position: absolute;
-    transform: translate(-50%,-50%);
-    left: 50%;
-    top: 50%;
-}
-.background .shape{
-    height: 200px;
-    width: 200px;
-    position: absolute;
-    border-radius: 50%;
-}
-.shape:first-child{
-    background: linear-gradient(
-        #1e4bb5,
-        #09246e
-    );
-    left: -80px;
-    top: -80px;
-}
-.shape:last-child{
-    background: linear-gradient(
-        to right,
-        #baa508a0,
-        #e3c00f
-    );
-    right: -30px;
-    bottom: -80px;
-}
-form{
-    height: 520px;
-    width: 400px;
-    background-color: rgba(255,255,255,0.13);
-    position: absolute;
-    transform: translate(-50%,-50%);
-    top: 50%;
-    left: 50%;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255,255,255,0.1);
-    box-shadow: 0 0 40px rgba(8,7,16,0.6);
-    padding: 50px 35px;
-}
-form *{
-    font-family: 'Poppins',sans-serif;
-    color: #ffffffd1;
-    letter-spacing: 0.5px;
-    outline: none;
-    border: none;
-}
-form img{
-    display: block;
-    margin: 0 auto;
-    width: 300px; /* Adjust the width as needed */
-    height: auto;
-}
-
-label{
-    display: block;
-    margin-top: 30px;
-    font-size: 16px;
-    font-weight: 500;
-}
-input{
-    display: block;
-    height: 50px;
-    width: 100%;
-    background-color: rgba(255,255,255,0.07);
-    border-radius: 3px;
-    padding: 0 10px;
-    margin-top: 8px;
-    font-size: 14px;
-    font-weight: 300;
-}
-::placeholder{
-    color: #e5e5e5;
-}
-button{
-    margin-top: 50px;
-    width: 100%;
-    background-color: #09246e;
-    color: #ffffff;
-    padding: 15px 0;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.social{
-  margin-top: 30px;
-  display: flex;
-}
-.social div{
-  background: red;
-  width: 150px;
-  border-radius: 3px;
-  padding: 5px 10px 10px 5px;
-  background-color: rgba(255,255,255,0.27);
-  color: #eaf0fb;
-  text-align: center;
-}
-.social div:hover{
-  background-color: rgba(255,255,255,0.47);
-}
-.social .fb{
-  margin-left: 25px;
-}
-.social i{
-  margin-right: 4px;
-}
-
-    </style>
+  <title>Login Page</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <style media="screen">
+    *, *:before, *:after {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #0d1956;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: relative;
+    }
+    .content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .background {
+      width: 430px;
+      height: 520px;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      left: 50%;
+      top: 50%;
+    }
+    .background .shape {
+      height: 200px;
+      width: 200px;
+      position: absolute;
+      border-radius: 50%;
+    }
+    .shape:first-child {
+      background: linear-gradient(#1e4bb5, #09246e);
+      left: -80px;
+      top: -80px;
+    }
+    .shape:last-child {
+      background: linear-gradient(to right, #baa508a0, #e3c00f);
+      right: -30px;
+      bottom: -80px;
+    }
+    form {
+      height: 520px;
+      width: 400px;
+      background-color: rgba(255,255,255,0.13);
+      position: absolute;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.1);
+      box-shadow: 0 0 40px rgba(8,7,16,0.6);
+      padding: 50px 35px;
+    }
+    form * {
+      font-family: 'Poppins', sans-serif;
+      color: #ffffffd1;
+      letter-spacing: 0.5px;
+      outline: none;
+      border: none;
+    }
+    form img {
+      display: block;
+      margin: 0 auto;
+      width: 300px;
+      height: auto;
+    }
+    label {
+      display: block;
+      margin-top: 30px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    input {
+      display: block;
+      height: 50px;
+      width: 100%;
+      background-color: rgba(255,255,255,0.07);
+      border-radius: 3px;
+      padding: 0 10px;
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 300;
+    }
+    ::placeholder {
+      color: #e5e5e5;
+    }
+    button {
+      margin-top: 50px;
+      width: 100%;
+      background-color: #09246e;
+      color: #ffffff;
+      padding: 15px 0;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .error-dialogue {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid red;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+    .error-dialogue p {
+      margin: 0;
+    }
+    .social {
+      margin-top: 30px;
+      display: flex;
+    }
+    .social div {
+      width: 150px;
+      border-radius: 3px;
+      padding: 5px 10px 10px 5px;
+      background-color: rgba(255,255,255,0.27);
+      color: #eaf0fb;
+      text-align: center;
+    }
+    .social div:hover {
+      background-color: rgba(255,255,255,0.47);
+    }
+    .social .fb {
+      margin-left: 25px;
+    }
+    .social i {
+      margin-right: 4px;
+    }
+    footer {
+      background-color: #0d195600;
+      padding: 20px 0;
+      text-align: center;
+      position: relative;
+      bottom: -30px;
+      width: 100%;
+    }
+    footer p {
+      color: #bfbdbde0;
+    }
+    footer a {
+      color: #6985af;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
+  <div class="content">
     <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
+      <div class="shape"></div>
+      <div class="shape"></div>
     </div>
     <form method="post">
-        {% csrf_token %}
-        {% load static %}
-        <img src="{% static 'images/logo_cpa1.png' %}" alt="CPA Logo">
-        
-        <label for="username">Username</label>
-        <input type="text" placeholder="Enter Username" id="username" name="username">
-
-        <label for="password">Password</label>
-        <input type="password" placeholder="Password" id="password" name="pass">
-
-        <button type="submit">Log In</button>
-    <p>
-    </br>
-    <center><a href="https://www.cpa-bank.dz/" >www.cpa-bank.dz</a></center>
-</p>
-</form>
+      {% csrf_token %}
+      {% load static %}
+      <img src="{% static 'images/logo_cpa1.png' %}" alt="CPA Logo">
+      <label for="username">Username</label>
+      <input type="text" placeholder="Enter Username" id="username" name="username" required>
+      <label for="password">Password</label>
+      <input type="password" placeholder="Password" id="password" name="pass" required>
+      <button type="submit">Log In</button>
+      <p>
+        <br>
+        <center><a href="https://www.cpa-bank.dz/" target="_blank">www.cpa-bank.dz</a></center>
+      </p>
+    </form>
+  </div>
+  {% if messages %}
+  <div class="error-dialogue">
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <!-- Footer -->
+  <footer class="footer bg-light-200 relative pt-1 border-b-2 mt-10">
+    <div class="container mx-auto px-6">
+      <div class="mt-5 flex flex-col items-center">
+        <div class="sm:w-2/3 text-center py-6">
+          <p class="text-md text-gray-900 font-bold mb-2">
+            © 2024 by <a href="https://github.com/hibahadj/BankTransactions.git" target="_blank"> hadjakr</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
