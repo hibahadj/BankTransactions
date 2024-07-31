@@ -54,7 +54,13 @@
     /* Flexbox container */
     .container-flex {
       display: flex;
-      height: 100vh;
+      flex-direction: column; /* Use column direction to stack content and footer */
+      height: 100vh; /* Full viewport height */
+    }
+
+    .main-content {
+      flex: 1; /* Take up remaining space */
+      display: flex;
     }
 
     /* Sidebar styles */
@@ -85,6 +91,14 @@
       padding: 20px;
       overflow-y: auto; /* Add scroll if content is too long */
     }
+
+    /* Footer styles */
+    .footer {
+      background-color: #11216f;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px 0;
+    }
   </style>
 </head>
 <body>
@@ -93,7 +107,9 @@
     <a class="navbar-brand" href="#">
       <img src="{% static 'images/logo_cpa1.png' %}" alt="Logo" style="height: 40px;">
     </a>
-    <a class="navbar-text" href="#" style="color: #ffffff; margin-left: 15px;"><h3>Home Page</h3></a>
+    <div class="mx-auto">
+      <h3 class="navbar-text" style="color: #ffffff;">Bank Transactions</h3>
+    </div>    
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -116,18 +132,26 @@
 
   <!-- Flexbox container -->
   <div class="container-flex">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <a href="#" class="page-1">Page 1</a>
-      <a href="#">Page 2</a>
-      <a href="#">Page 3</a>
-      <!-- Add more links as needed -->
+    <!-- Main content with sidebar and content area -->
+    <div class="main-content">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <a href="#" class="page-1">Page 1</a>
+        <a href="#">Page 2</a>
+        <a href="#">Page 3</a>
+        <!-- Add more links as needed -->
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- Your page content goes here -->
+      </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="content">
-      <!-- Your page content goes here -->
-    </div>
+    <!-- Footer -->
+    <footer class="footer">
+      <p>© 2024 by Hadjakr</p>
+    </footer>
   </div>
 
   <!-- Optional JavaScript -->
