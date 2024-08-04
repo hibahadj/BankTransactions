@@ -31,6 +31,7 @@ urlpatterns = [
     path('comptes/', ListeComptesView.as_view(), name='comptes'),
     path('transactions/', ListeTransactionsView.as_view(), name='trasactions'),
     path('infopersonels/', InfoPersonelsView.as_view(), name='Infopersonels'),
+    path('create_client/', views.CreateClient, name='create_client'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

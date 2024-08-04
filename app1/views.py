@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
+
 class ListeClientsView(TemplateView):
     template_name = 'liste_clients.html'
 
@@ -48,3 +49,28 @@ def AdminHomePage(request):
 @login_required
 def ClientHomePage(request):
     return render(request, 'client_home.html')
+
+@login_required
+def CreateClient(request):
+    if request.method == 'POST':
+        utilisateurnom = request.POST.get('utilisateurnom')
+        utilisateurprenom = request.POST.get('utilisateurprenom')
+        utilisateuremail = request.POST.get('utilisateuremail')
+        clientadresse = request.POST.get('clientadresse')
+        clientcp = request.POST.get('clientcp')
+        clientdn = request.POST.get('clientdn')
+        
+        # Créer un nouveau client
+        Client.objects.create(
+            utilisateurnom=utilisateurnom,
+            utilisateurprenom=utilisateurprenom,
+            utilisateuremail=utilisateuremail,
+            clientadresse=clientadresse,
+            clientcp=clientcp,
+            clientdn=clientdn
+        )
+        
+        messages.success(request, "Client created successfully.")
+        return redirect('admin_home')
+    return redirect('admin_home')  # Gérer le cas où la requête n'est pas POST
+
