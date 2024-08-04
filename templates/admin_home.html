@@ -104,11 +104,11 @@
 <body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand navbar-custom">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand" href="{% url 'admin_home' %}">
       <img src="{% static 'images/logo_cpa1.png' %}" alt="Logo" style="height: 40px;">
     </a>
     <div class="mx-auto">
-      <h3 class="navbar-text" style="color: #ffffff;">Bank Transactions</h3>
+      <h3 class="navbar-text" style="color: #ffffff;"></h3>
     </div>    
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -136,15 +136,18 @@
     <div class="main-content">
       <!-- Sidebar -->
       <div class="sidebar">
-        <a href="#" class="page-1">Page 1</a>
-        <a href="#">Page 2</a>
-        <a href="#">Page 3</a>
+        <a href="{% url 'clients' %}" class="page-1">Liste Clients</a>
+        <a href="{% url 'comptes' %}">Liste Comptes</a>
+        <a href="{% url 'trasactions' %}">Liste Transatctions</a>
+        <a href="{% url 'Infopersonels' %}">info personels</a>
         <!-- Add more links as needed -->
       </div>
 
       <!-- Main Content -->
       <div class="content">
-        <!-- Your page content goes here -->
+        {% block content %}
+        <!-- Default content or placeholder if no content is provided -->
+        {% endblock %}
       </div>
     </div>
 

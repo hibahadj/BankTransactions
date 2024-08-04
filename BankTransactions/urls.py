@@ -19,12 +19,18 @@ from django.views.generic.base import RedirectView
 from django.urls import path
 from app1 import views
 from django.conf import settings
+from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/login/', permanent=False), name='home_redirect'),
     path('login/',views.LoginPage,name='login'),
-    path('home/',views.HomePage,name='home'),
     path('logout/',views.LogoutPage,name='logout'),
+    path('admin_home/', views.AdminHomePage, name='admin_home'),
+    path('client_home/', views.ClientHomePage, name='client_home'),
+    path('clients/', ListeClientsView.as_view(), name='clients'),
+    path('comptes/', ListeComptesView.as_view(), name='comptes'),
+    path('transactions/', ListeTransactionsView.as_view(), name='trasactions'),
+    path('infopersonels/', InfoPersonelsView.as_view(), name='Infopersonels'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
