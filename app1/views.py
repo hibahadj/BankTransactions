@@ -3,10 +3,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import TemplateView
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView
+from app1.models import Client, Compte, Transaction, HistoriqueTransaction
 from django.views.decorators.cache import never_cache
 
-class ListeClientsView(TemplateView):
+class ListeClientsView(ListView):
+    model = Client
     template_name = 'liste_clients.html'
+    context_object_name = 'clients'
 
 class ListeComptesView(TemplateView):
     template_name = 'liste_comptes.html'
@@ -18,7 +23,7 @@ class InfoPersonelsView(TemplateView):
     template_name = 'info_personels.html'
 
 
-# Create your views here.
+#Login
 def LoginPage(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -27,14 +32,14 @@ def LoginPage(request):
         
         if user is not None:
             login(request, user)
-            # Redirection basée sur le rôle de l'utilisateur
+
             if user.is_superuser:
                 return redirect('admin_home')
             else:
                 return redirect('client_home')
         else:
             messages.error(request, "Username or Password is incorrect !!!")
-            return redirect('login')  # Redirection après avoir défini le message
+            return redirect('login')
 
     return render(request, 'login.html')
 
@@ -53,24 +58,20 @@ def ClientHomePage(request):
 @login_required
 def CreateClient(request):
     if request.method == 'POST':
-        utilisateurnom = request.POST.get('utilisateurnom')
-        utilisateurprenom = request.POST.get('utilisateurprenom')
-        utilisateuremail = request.POST.get('utilisateuremail')
-        clientadresse = request.POST.get('clientadresse')
-        clientcp = request.POST.get('clientcp')
+        clientnom = request.POST.get('clientnom')
+        clientprenom = request.POST.get('clientprenom')
+        clientemail = request.POST.get('clientemail')
+        clienttelephone = request.POST.get('clienttelephone')
         clientdn = request.POST.get('clientdn')
         
-        # Créer un nouveau client
-        Client.objects.create(
-            utilisateurnom=utilisateurnom,
-            utilisateurprenom=utilisateurprenom,
-            utilisateuremail=utilisateuremail,
-            clientadresse=clientadresse,
-            clientcp=clientcp,
+        client = Client.objects.create(
+            clientnom=clientnom,
+            clientprenom=clientprenom,
+            clientemail=clientemail,
+            clienttelephone=clienttelephone,
             clientdn=clientdn
         )
         
         messages.success(request, "Client created successfully.")
         return redirect('admin_home')
-    return redirect('admin_home')  # Gérer le cas où la requête n'est pas POST
-
+    return redirect('admin_home')
