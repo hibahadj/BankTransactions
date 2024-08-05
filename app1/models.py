@@ -3,14 +3,15 @@ from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 
 class Client(models.Model):
-    clientid = models.AutoField(primary_key=True, default= 1 )
+    clientid = models.AutoField(primary_key=True)
     clientnom = models.CharField(max_length=255, null=True)
     clientprenom = models.CharField(max_length=255, null=True)
     clientdn = models.DateField(null=True, blank=True)
     clientemail = models.EmailField(max_length=255, null=True, blank=True)
     clienttelephone = models.CharField(max_length=20, null=True, blank=True)
     clientusername = models.CharField(max_length=255, unique=True, editable=False, null=True)
-    clientpassword = models.CharField(max_length=255, null=True)
+    clientpassword = models.CharField(max_length=255, default='client123')
+    clientadresse = models.CharField(max_length=255, null=True)
     is_active = models.BooleanField(default=True)
     class Meta:
         db_table = 'Client'

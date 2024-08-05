@@ -2,11 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.views.generic import TemplateView
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView
-from app1.models import Client, Compte, Transaction, HistoriqueTransaction
-from django.views.decorators.cache import never_cache
+from django.views.generic import TemplateView, ListView
+from app1.models import Client
 
 class ListeClientsView(ListView):
     model = Client
@@ -22,8 +19,7 @@ class ListeTransactionsView(TemplateView):
 class InfoPersonelsView(TemplateView):
     template_name = 'info_personels.html'
 
-
-#Login
+# Login
 def LoginPage(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -62,16 +58,17 @@ def CreateClient(request):
         clientprenom = request.POST.get('clientprenom')
         clientemail = request.POST.get('clientemail')
         clienttelephone = request.POST.get('clienttelephone')
+        clientadresse = request.POST.get('clientadresse')
         clientdn = request.POST.get('clientdn')
         
-        client = Client.objects.create(
+        Client.objects.create(
             clientnom=clientnom,
             clientprenom=clientprenom,
             clientemail=clientemail,
             clienttelephone=clienttelephone,
+            clientadresse=clientadresse,
             clientdn=clientdn
         )
         
         messages.success(request, "Client created successfully.")
-        return redirect('admin_home')
-    return redirect('admin_home')
+        return redirect('clients')  # Redirection vers la liste des clients

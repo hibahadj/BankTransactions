@@ -16,35 +16,35 @@
         <th>Username</th>
         <th>Email</th>
         <th>Address</th>
-
+        
         <th>Date de naissance</th>
       </tr>
     </thead>
     <tbody>
-      {% for Client in Clients %}
+      {% for client in clients %}
       <tr>
-        <td>{{ Client.clientnom }}</td>
-        <td>{{ Client.clientprenom }}</td>
-        <td>{{ Client.clientemail }}</td>
-        <td>{{ Client.clienttelephone }}</td>
-        <td>{{ Client.clientadresse }}</td>
-        
-        <td>{{ Client.clientdn }}</td>
+        <td>{{ client.clientid }}</td>
+        <td>{{ client.clientnom }}</td>
+        <td>{{ client.clientprenom }}</td>
+        <td>{{ client.clientusername }}</td>
+        <td>{{ client.clientemail }}</td>
+        <td>{{ client.clientadresse }}</td>
+        <td>{{ client.clientdn }}</td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="8">No clients available.</td>
+        <td colspan="7">No clients available.</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 
-  <!-- Modale -->
+  <!-- Modal -->
   <div id="clientModal" class="modal">
     <div class="modal-content">
       <span id="closeModal" class="close">&times;</span>
-      <h2>Veillez remplire les informations </h2>
-      <form method="POST" action="{% url 'create_client' %}">
+      <h2>Veillez remplir les informations</h2>
+      <form id="clientForm" method="POST" action="{% url 'create_client' %}">
         {% csrf_token %}
         <label for="clientnom">Nom :</label>
         <input type="text" class="form-control" id="clientnom" name="clientnom" required>
@@ -58,11 +58,11 @@
         <label for="clienttelephone">Téléphone :</label>
         <input type="text" class="form-control" id="clienttelephone" name="clienttelephone">
 
-        <label for="clientadresse">Address:</label>
+        <label for="clientadresse">Adresse :</label>
         <input type="text" id="clientadresse" name="clientadresse" required>
 
         <label for="clientdn">Date de naissance :</label>
-        <input type="date" class="form-control" id="clientdn" name="clientdn">
+        <input type="date" class="form-control" id="clientdn" name="clientdn" max="{{ today }}" required>
 
         <button type="submit" class="btn btn-create">Submit</button>
         <a href="{% url 'clients' %}" class="btn btn-cancel">Annuler</a>
@@ -133,6 +133,11 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
   </style>
 
   <script>
@@ -152,6 +157,16 @@
     window.onclick = function(event) {
       if (event.target == modal) {
         modal.style.display = "none";
+      }
+    }
+
+    // Validation JavaScript pour la date de naissance
+    document.getElementById('clientForm').onsubmit = function(event) {
+      var clientdn = document.getElementById('clientdn').value;
+      var today = new Date().toISOString().split('T')[0];
+      if (clientdn > today) {
+        event.preventDefault(); // Empêche l'envoi du formulaire
+        alert('La date de naissance ne peut pas être une date future.');
       }
     }
   </script>
