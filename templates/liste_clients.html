@@ -263,5 +263,17 @@
   }
   
   </script>
+  <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+  <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+  <script>
+    // JavaScript to set the max date to today
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get today's date in the format YYYY-MM-DD
+        var today = new Date().toISOString().split('T')[0];
+        
+        // Set the max attribute of the date input
+        document.getElementById('clientdn').setAttribute('max', today);
+    });
+    </script>
 </div>
 {% endblock %}
