@@ -22,14 +22,14 @@ from django.conf import settings
 from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', RedirectView.as_view(url='/login/', permanent=False), name='home_redirect'),
+    path('', RedirectView.as_view(url='/login/', permanent=False), name='home_redirect'),  # Redirect to LOGIN_URL
     path('login/',views.LoginPage,name='login'),
     path('logout/',views.LogoutPage,name='logout'),
     path('admin_home/', views.AdminHomePage, name='admin_home'),
     path('client_home/', views.ClientHomePage, name='client_home'),
     path('clients/', ListeClientsView.as_view(), name='clients'),
     path('comptes/', ListeComptesView.as_view(), name='comptes'),
-    path('transactions/', ListeTransactionsView.as_view(), name='trasactions'),
+    path('transactions/', ListeTransactionsView.as_view(), name='transactions'),
     path('infopersonels/', InfoPersonelsView.as_view(), name='Infopersonels'),
     path('create_client/', views.CreateClient, name='create_client'),
 ]

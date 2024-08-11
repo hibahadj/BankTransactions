@@ -10,17 +10,24 @@ class Client(models.Model):
     clientemail = models.EmailField(max_length=255, null=True, blank=True)
     clienttelephone = models.CharField(max_length=20, null=True, blank=True)
     clientusername = models.CharField(max_length=255, unique=True, editable=False, null=True)
-    clientpassword = models.CharField(max_length=255, default='client123')
+    clientpassword = models.CharField(max_length=255)
     clientadresse = models.CharField(max_length=255, null=True)
     is_active = models.BooleanField(default=True)
+    last_login = models.DateTimeField(blank=True, null=True)
+
     class Meta:
         db_table = 'Client'
+
     def save(self, *args, **kwargs):
         if not self.clientusername:
             self.clientusername = f"{self.clientprenom}.{self.clientnom}".lower()
-        if not self.pk or 'clientpassword' in kwargs.get('update_fields', []):
-            self.clientpassword = make_password(self.clientpassword)
+        if not self.pk and not self.clientpassword:  # If creating a new client without a password
+            self.set_password('client123')  # Default password
         super().save(*args, **kwargs)
+
+    def set_password(self, raw_password):
+        self.clientpassword = make_password(raw_password)
+        self.save()
 
     def check_password(self, raw_password):
         return check_password(raw_password, self.clientpassword)
@@ -35,7 +42,7 @@ class Compte(models.Model):
         ('Dollar', 'Dollar'),
         ('Dirhem', 'Dirhem'),
     ]
-    compteid = models.AutoField(primary_key=True, default= 1)
+    compteid = models.AutoField(primary_key=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
     comptesolde = models.FloatField(null=True, blank=True)
     comptedevise = models.CharField(max_length=10, choices=DEVICES_CHOICES, null=True, blank=True)
@@ -61,7 +68,7 @@ class Transaction(models.Model):
         ('Crédit', 'Crédit'),
         ('Débit', 'Débit'),
     ]
-    transactionid = models.AutoField(primary_key=True, default= 1)
+    transactionid = models.AutoField(primary_key=True)
     compte = models.ForeignKey(Compte, on_delete=models.CASCADE, null=True)
     transactiontype = models.CharField(max_length=10, choices=TYPE_TRANSACTION_CHOICES, null=True)
     transactionmontant = models.FloatField(null=True)
@@ -72,7 +79,7 @@ class Transaction(models.Model):
     class Meta:
         db_table = 'Transaction'
 class HistoriqueTransaction(models.Model):
-    historiqueid = models.AutoField(primary_key=True, default= 1)
+    historiqueid = models.AutoField(primary_key=True)
     transaction = models.OneToOneField(Transaction, on_delete=models.CASCADE, null=True)
     compte = models.ForeignKey(Compte, on_delete=models.CASCADE, null=True)
 
@@ -81,18 +88,27 @@ class HistoriqueTransaction(models.Model):
     class Meta:
         db_table = 'HistoriqueTransaction'
 class Admin(models.Model):
-    adminusername = models.CharField(max_length=255, primary_key=True, default='admin')
-    adminpassword = models.CharField(max_length=100, default='admin123')
+    adminid = models.AutoField(primary_key=True)
+    adminusername = models.CharField(max_length=255, unique=True)  # Ensure uniqueness
+    adminpassword = models.CharField(max_length=255)  # Remove default value
     adminemail = models.CharField(max_length=255, null=True)
+    last_login = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'Admin'
+
     def save(self, *args, **kwargs):
-        if not self.pk or 'adminpassword' in kwargs.get('update_fields', []):
-            self.adminpassword = make_password(self.adminpassword)
+        if not self.pk and not self.adminpassword:  # If creating a new admin without a password
+            self.set_password('admin123')  # Default password
         super().save(*args, **kwargs)
+
+    def set_password(self, raw_password):
+        self.adminpassword = make_password(raw_password)
+        self.save()
 
     def check_password(self, raw_password):
         return check_password(raw_password, self.adminpassword)
 
     def __str__(self):
         return self.adminusername
-    class Meta:
-        db_table = 'Admin'
+    

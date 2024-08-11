@@ -171,7 +171,7 @@
       <div class="shape"></div>
     </div>
     <form method="post">
-      {% csrf_token %}
+     {% csrf_token %}
       {% load static %}
       <img src="{% static 'images/logo_cpa1.png' %}" alt="CPA Logo">
       <label for="username">Username</label>
@@ -204,5 +204,6 @@
       </div>
     </div>
   </footer>
+ <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
 </body>
 </html>
