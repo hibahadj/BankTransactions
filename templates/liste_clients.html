@@ -6,7 +6,14 @@
     <h1>Clients List</h1>
     <button id="openModal" class="btn btn-create">Create New Client</button>
   </div>
-  
+   <!-- Conteneur pour les messages flash -->
+   {% if messages %}
+   <div class="message-container">
+     {% for message in messages %}
+       <div class="message {{ message.tags }}">{{ message }}</div>
+     {% endfor %}
+   </div>
+ {% endif %}
   <table class="table">
     <thead>
       <tr>
@@ -21,29 +28,33 @@
         <th>Actions</th>
       </tr>
     </thead>
-    <tbody>
-      {% for client in clients %}
-      <tr>
-        <td>{{ client.clientid }}</td>
-        <td>{{ client.clientnom }}</td>
-        <td>{{ client.clientprenom }}</td>
-        <td>{{ client.clientusername }}</td>
-        <td>{{ client.clientemail }}</td>
-        <td>{{ client.clientadresse }}</td>
-        <td>{{ client.clientdn }}</td>
-        <td>
-          <a href="#" class="action-icon" title="View Accounts">
-            <i class="fa-solid fa-user"></i>
-          </a>
-          <a href="#" class="action-icon" title="Edit">
-            <i class="fa-solid fa-pen"></i>
-          </a>
-          <a href="#" class="action-icon" title="Delete" onclick="return confirm('Are you sure you want to delete this client?');">
-            <i class="fa-solid fa-minus"></i>
-          </a>
-          
-        </td>
-      </tr>
+    
+      <tbody>
+        {% for client in clients %}
+        <tr>
+          <td>{{ client.clientid }}</td>
+          <td>{{ client.clientnom }}</td>
+          <td>{{ client.clientprenom }}</td>
+          <td>{{ client.clientusername }}</td>
+          <td>{{ client.clientemail }}</td>
+          <td>{{ client.clientadresse }}</td>
+          <td>{{ client.clientdn }}</td>
+          <td>
+            <a href="#" class="action-icon" title="View Accounts">
+              <i class="fa-solid fa-user"></i>
+            </a>
+            <a href="#" class="action-icon" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </a>
+            <form method="POST" action="{% url 'delete_client' client.clientid %}" style="display:inline;" class="delete-client-form" onclick="return confirm('Are you sure you want to delete this client?');">
+              {% csrf_token %}
+              <button type="submit" class="action-icon" title="Delete">
+                  <i class="fa-solid fa-minus"></i>
+              </button>
+          </form>
+          </td>
+        </tr>
+      
       {% empty %}
       <tr>
         <td colspan="8">No clients available.</td>
@@ -66,24 +77,32 @@
         <input type="text" class="form-control" id="clientprenom" name="clientprenom" required>
 
         <label for="clientemail">Email :</label>
-        <input type="email" class="form-control" id="clientemail" name="clientemail">
+        <input type="email" class="form-control" id="clientemail" name="clientemail" required>
 
         <label for="clienttelephone">Téléphone :</label>
-        <input type="text" class="form-control" id="clienttelephone" name="clienttelephone">
+        <input type="text" class="form-control" id="clienttelephone" name="clienttelephone" required>
 
         <label for="clientadresse">Adresse :</label>
         <input type="text" class="form-control" id="clientadresse" name="clientadresse" required>
 
         <label for="clientdn">Date de naissance :</label>
-        <input type="date" class="form-control" id="clientdn" name="clientdn">
+        <input type="date" class="form-control" id="clientdn" name="clientdn" required>
 
         <div class="form-buttons">
-          <button type="submit" class="btn btn-create">Submit</button>
+
           <a href="{% url 'clients' %}" class="btn btn-cancel">Annuler</a>
+          <button type="submit" class="btn btn-create">Submit</button>
         </div>
       </form>
     </div>
   </div>
+  {% if messages %}
+  <div class="success-dialogue">
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <style>
     /* Styles pour la modale */
@@ -159,6 +178,21 @@
       margin-top: 20px;
     }
 
+    .success-dialogue {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #79e988;
+      color: #0b2509;
+      border: 1px solid rgb(13, 107, 29);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+
     /* Styles pour les icônes d'action */
     .action-icon {
   text-decoration: none;
@@ -171,6 +205,7 @@
 .action-icon:hover {
   color: #007bff;
 }
+
   </style>
 
   <script>
@@ -194,6 +229,39 @@
         }
       }
     });
+    function delete_client(event) {
+    event.preventDefault(); // Empêche le comportement par défaut du lien
+    var clientId = event.currentTarget.getAttribute('data-client-id');
+    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    if (confirm('Are you sure you want to delete this client?')) {
+      fetch(`/delete_client/${clientId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        }
+      })
+      .then(response => {
+    if (response.ok) {
+        // Supprimer la ligne du tableau
+        event.currentTarget.closest('tr').remove();
+        //alert('Client deleted successfully.');
+    } else {
+        // Afficher les détails de l'erreur
+        response.text().then(errorText => {
+            alert(`An error occurred while deleting the client: ${errorText}`);
+        });
+    }
+})
+
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the client.');
+      });
+    }
+  }
+  
   </script>
 </div>
 {% endblock %}

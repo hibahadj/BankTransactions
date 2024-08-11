@@ -1,17 +1,45 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
 from django.contrib.auth.decorators import login_required
+
 from django.utils import timezone
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import csrf_protect
 from app1.models import Client, Admin
 from django.contrib.auth.hashers import check_password
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.http import JsonResponse
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+
+
+def delete_client(request, client_id):
+    if request.method == 'POST':
+        try:
+            client = get_object_or_404(Client, clientid=client_id)
+            client.delete()
+            messages.success(request, "Client deleted successfully.")
+        except Client.DoesNotExist:
+            messages.error(request, 'Client does not exist.')
+        except Exception as e:
+            messages.error(request, f'An error occurred while deleting the client: {str(e)}')
+    else:
+        messages.error(request, 'Invalid request method. Please use POST.')
+    
+    return redirect('clients')  # Redirige vers la page de liste des clients
+
 
 class ListeClientsView(ListView):
     model = Client
     template_name = 'liste_clients.html'
     context_object_name = 'clients'
+
+    
 
 class ListeComptesView(TemplateView):
     template_name = 'liste_comptes.html'
@@ -174,3 +202,10 @@ def CreateClient(request):
 
     print("Rendering CreateClient form")
     return render(request, 'create_client.html')  # Render a form for GET requests
+
+    def clean_date_of_birth(self):
+        date_of_birth = self.cleaned_data.get('date_of_birth')
+        if date_of_birth and date_of_birth > date.today():
+            raise ValidationError("La date de naissance ne peut pas être supérieure à la date actuelle.")
+        return date_of_birth
+    
