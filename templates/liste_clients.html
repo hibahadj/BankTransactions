@@ -4,17 +4,16 @@
 <div class="container">
   <div class="header">
     <h1>Clients List</h1>
-    <button id="openModal" class="btn btn-create">Create New Client</button>
+    <button id="openModal" class="btn btn-create"> <i class="fa-solid fa-plus"></i> Create New Client</button>
   </div>
-   <!-- Conteneur pour les messages flash -->
-   {% if messages %}
-   <div class="message-container">
-     {% for message in messages %}
-       <div class="message {{ message.tags }}">{{ message }}</div>
-     {% endfor %}
-   </div>
- {% endif %}
-  <table class="table">
+
+    <!-- Search Bar -->
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
+  <i class="fa fa-search search-icon"></i>
+</div>
+
+  <table class="table" id="clientTable">
     <thead>
       <tr>
         <th>ID</th>
@@ -206,6 +205,37 @@
   color: #007bff;
 }
 
+.search-container {
+  display: flex;
+  align-items: center; /* Aligns items vertically in the center */
+  position: relative; /* Allows absolute positioning of the icon */
+  width: 100%; /* Adjust as needed */
+  max-width: 400px; /* Adjust the max-width as needed */
+}
+
+.search-bar {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #11216f;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 57%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #666;
+}
+
+.search-icon.hidden {
+  opacity: 0; /* Hide the icon */
+  pointer-events: none; /* Prevent clicking */
+}
+
   </style>
 
   <script>
@@ -275,5 +305,54 @@
         document.getElementById('clientdn').setAttribute('max', today);
     });
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var searchInput = document.getElementById('searchInput');
+  var searchIcon = document.querySelector('.search-icon');
+  var table = document.getElementById('clientTable');
+  var tr = table.getElementsByTagName('tr');
+
+  // Function to toggle the visibility of the search icon
+  function toggleIconVisibility() {
+    if (searchInput.value.trim() === '') {
+      searchIcon.classList.remove('hidden');
+    } else {
+      searchIcon.classList.add('hidden');
+    }
+  }
+
+  // Event listener for filtering the client list
+  searchInput.addEventListener('keyup', function() {
+    var filter = searchInput.value.toLowerCase();
+
+    for (var i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+      var tdId = tr[i].getElementsByTagName('td')[0];
+      var tdNom = tr[i].getElementsByTagName('td')[1];
+      var tdPrenom = tr[i].getElementsByTagName('td')[2];
+      if (tdId || tdNom || tdPrenom) {
+        var idValue = tdId.textContent || tdId.innerText;
+        var nomValue = tdNom.textContent || tdNom.innerText;
+        var prenomValue = tdPrenom.textContent || tdPrenom.innerText;
+        if (idValue.toLowerCase().indexOf(filter) > -1 || 
+            nomValue.toLowerCase().indexOf(filter) > -1 || 
+            prenomValue.toLowerCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+
+    // Toggle icon visibility based on input value
+    toggleIconVisibility();
+  });
+
+  // Initial check to ensure the icon is visible if the input is empty
+  toggleIconVisibility();
+});
+
+</script> 
+
 </div>
 {% endblock %}
