@@ -42,13 +42,13 @@
             <a href="#" class="action-icon" title="View Accounts">
               <i class="fa-solid fa-user"></i>
             </a>
-            <a href="#" class="action-icon" title="Edit">
+            <a  href="{%  url 'edit_client' client_id=client.clientid %}" class="action-icon edit-client" data-client-id="{{ client.clientid }}" title="Edit">
               <i class="fa-solid fa-pen"></i>
             </a>
             <form method="POST" action="{% url 'delete_client' client.clientid %}" style="display:inline;" class="delete-client-form" onclick="return confirm('Are you sure you want to delete this client?');">
               {% csrf_token %}
               <button type="submit" class="action-icon" title="Delete">
-                  <i class="fa-solid fa-minus"></i>
+                  <i class="fa-solid fa-trash"></i>
               </button>
           </form>
           </td>
@@ -94,6 +94,32 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <div id="editClientModal" class="modal">
+    <div class="modal-content">
+      <span id="closeEditModal" class="close">&times;</span>
+      <h2>Edit Client</h2>
+      <form id="editClientForm" method="POST" action="">
+        {% csrf_token %}
+        <input type="hidden" id="editClientId" name="clientid">
+        <label for="editClientnom">Nom :</label>
+        <input type="text" class="form-control" id="editClientnom" name="clientnom" required>
+        <label for="editClientprenom">Prénom :</label>
+        <input type="text" class="form-control" id="editClientprenom" name="clientprenom" required>
+        <label for="editClientemail">Email :</label>
+        <input type="email" class="form-control" id="editClientemail" name="clientemail" required>
+        <label for="editClientadresse">Adresse :</label>
+        <input type="text" class="form-control" id="editClientadresse" name="clientadresse" required>
+        <label for="editClientdn">Date de naissance :</label>
+        <input type="date" class="form-control" id="editClientdn" name="clientdn" required>
+        <div class="form-buttons">
+          <button type="button" id="cancelEdit" class="btn btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-create">Update</button>
+        </div>
+      </form>
+    </div>
+  
   </div>
   {% if messages %}
   <div class="success-dialogue">
@@ -194,57 +220,114 @@
 
     /* Styles pour les icônes d'action */
     .action-icon {
-  text-decoration: none;
-  color: #333;
-  margin: 0 5px;
-  font-size: 1.2em;
-  display: inline-block; /* Assure que les icônes sont affichées correctement */
-}
+      text-decoration: none;
+      color: #333;
+      margin: 0 5px;
+      font-size: 1.2em;
+      display: inline-block; /* Assure que les icônes sont affichées correctement */
+    }
 
-.action-icon:hover {
-  color: #007bff;
-}
+    .action-icon:hover {
+     color: #007bff;
+    }
 
-.search-container {
-  display: flex;
-  align-items: center; /* Aligns items vertically in the center */
-  position: relative; /* Allows absolute positioning of the icon */
-  width: 100%; /* Adjust as needed */
-  max-width: 400px; /* Adjust the max-width as needed */
-}
+    .search-container {
+      display: flex;
+      align-items: center; /* Aligns items vertically in the center */
+      position: relative; /* Allows absolute positioning of the icon */
+      width: 100%; /* Adjust as needed */
+      max-width: 400px; /* Adjust the max-width as needed */
+    }
 
-.search-bar {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #11216f;
-  border-radius: 4px;
-  width: 100%;
-}
+    .search-bar {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #11216f;
+      border-radius: 4px;
+      width: 100%;
+    }
 
-.search-icon {
-  position: absolute;
-  right: 10px;
-  top: 57%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  color: #666;
-}
+    .search-icon {
+      position: absolute;
+      right: 10px;
+      top: 57%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: #666;
+    }
 
-.search-icon.hidden {
-  opacity: 0; /* Hide the icon */
-  pointer-events: none; /* Prevent clicking */
-}
+    .search-icon.hidden {
+      opacity: 0; /* Hide the icon */
+      pointer-events: none; /* Prevent clicking */
+    }
 
   </style>
 
+  <script>
+    // JavaScript to set the max date to today
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get today's date in the format YYYY-MM-DD
+        var today = new Date().toISOString().split('T')[0];
+        
+        // Set the max attribute of the date input
+        document.getElementById('clientdn').setAttribute('max', today);
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var modal = document.getElementById("editClientModal");
+        var closeBtn = document.getElementById("closeEditModal");
+        var cancelBtn = document.getElementById("cancelEdit");
+        var editLinks = document.querySelectorAll('.edit-client');
+    
+        function openEditModal(clientId) {
+            fetch(`/get_client_data/${clientId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editClientId').value = data.clientid;
+                    document.getElementById('editClientForm').action = `/edit_client/${data.clientid}/`;
+                    document.getElementById('editClientnom').value = data.clientnom;
+                    document.getElementById('editClientprenom').value = data.clientprenom;
+                    document.getElementById('editClientemail').value = data.clientemail;
+                    document.getElementById('editClientadresse').value = data.clientadresse;
+                    document.getElementById('editClientdn').value = data.clientdn;
+                    modal.style.display = 'block';
+                });
+        }
+    
+        editLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                var clientId = this.getAttribute('data-client-id');
+                openEditModal(clientId);
+            });
+        });
+    
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+    
+        cancelBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+    
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    });
+    
+  </script>
   <script>
     // JavaScript pour ouvrir et fermer la modale
     document.addEventListener('DOMContentLoaded', function() {
       var modal = document.getElementById("clientModal");
       var btn = document.getElementById("openModal");
       var span = document.getElementById("closeModal");
-
+      
       btn.onclick = function() {
         modal.style.display = "block";
       }
@@ -295,17 +378,13 @@
   </script>
   <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
   <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
-  <script>
-    // JavaScript to set the max date to today
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get today's date in the format YYYY-MM-DD
-        var today = new Date().toISOString().split('T')[0];
-        
-        // Set the max attribute of the date input
-        document.getElementById('clientdn').setAttribute('max', today);
-    });
-    </script>
 
+
+
+
+
+
+  
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var searchInput = document.getElementById('searchInput');

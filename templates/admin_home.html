@@ -187,7 +187,7 @@
       <img src="{% static 'images/logo_cpa1.png' %}" alt="Logo" style="height: 40px;">
       
       <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-      
+
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -214,11 +214,12 @@
     <div class="main-content">
       <!-- Sidebar -->
       <div id="sidebar" class="sidebar">
-        <a href="{% url 'admin_home' %}" class="nav-link"> <i class="fa-solid fa-house"></i> Home</a>
-        <a href="{% url 'clients' %}" class="nav-link"> <i class="fa fa-users"></i> Liste Clients</a>
-        <a href="{% url 'comptes' %}" class="nav-link"> <i class="fa-solid fa-building-columns"></i> Liste Comptes</a>
-        <a href="{% url 'transactions' %}" class="nav-link"> <i class="fa-solid fa-money-check-dollar"></i> Liste Transatctions</a>
-        <a href="{% url 'Infopersonels' %}" class="nav-link"> <i class="fa-solid fa-user"></i> info personels</a>
+        <a href="{% url 'admin_home' %}" class="nav-link"> <i class="fa-solid fa-house"></i> Acceuil</a>
+        <a href="{% url 'clients' %}" class="nav-link"> <i class="fa fa-users"></i> Liste de Clients</a>
+        <a href="{% url 'comptes' %}" class="nav-link"> <i class="fa-solid fa-building-columns"></i> Liste des Comptes</a>
+        <a href="{% url 'transactions' %}" class="nav-link"> <i class="fa-solid fa-money-check-dollar"></i> Liste des Transatctions</a>
+        <a href="{% url 'Infopersonels' %}" class="nav-link"> <i class="fa-solid fa-user"></i> Informations</a>
+        <a href="#" class="nav-link"> <i class="fa-solid fa-gear"></i> Paramètre</a>
         <!-- Add more links as needed -->
       </div>
 

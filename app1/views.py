@@ -14,6 +14,8 @@ from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from .forms import ClientForm
+from django.http import JsonResponse
 
 
 
@@ -38,7 +40,7 @@ class ListeClientsView(ListView):
     model = Client
     template_name = 'liste_clients.html'
     context_object_name = 'clients'
-    
+
 
 
 class ListeComptesView(TemplateView):
@@ -215,6 +217,30 @@ def CreateClient(request):
     print("Rendering CreateClient form")
     return render(request, 'create_client.html')  # Render a form for GET requests
     
+def get_client_data(request, client_id):
+    client = get_object_or_404(Client, clientid=client_id)
+    client_data = {
+        'clientid': client.clientid,
+        'clientnom': client.clientnom,
+        'clientprenom': client.clientprenom,
+        'clientusername': client.clientusername,
+        'clientemail': client.clientemail,
+        'clientadresse': client.clientadresse,
+        'clientdn': client.clientdn.strftime('%Y-%m-%d'),  # Format date for HTML input
+    }
+    return JsonResponse(client_data)
+
+
+def edit_client(request, client_id):
+    client = get_object_or_404(Client, clientid=client_id)
+    if request.method == 'POST':
+        form = ClientForm(request.POST, instance=client)
+        if form.is_valid():
+            form.save()
+            return redirect('clients')  # Redirect to the clients list
+    else:
+        form = ClientForm(instance=client)
+    return render(request, 'edit_client.html', {'form': form, 'client': client})
 
 
    
