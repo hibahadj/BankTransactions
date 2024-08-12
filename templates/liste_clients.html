@@ -7,11 +7,11 @@
     <button id="openModal" class="btn btn-create"> <i class="fa-solid fa-plus"></i> Create New Client</button>
   </div>
 
-    <!-- Search Bar -->
-<div class="search-container">
-  <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
-  <i class="fa fa-search search-icon"></i>
-</div>
+  <!-- Search Bar -->
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
+    <i class="fa fa-search search-icon"></i>
+  </div>
 
   <table class="table" id="clientTable">
     <thead>
@@ -51,9 +51,8 @@
                   <i class="fa-solid fa-trash"></i>
               </button>
           </form>
-          </td>
-        </tr>
-      
+        </td>
+      </tr>
       {% empty %}
       <tr>
         <td colspan="8">No clients available.</td>
@@ -62,38 +61,31 @@
     </tbody>
   </table>
 
-  <!-- Modal -->
-  <div id="clientModal" class="modal">
+  <!-- Modal for editing client -->
+  <div id="editClientModal" class="modal">
     <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h2>Veillez remplir les informations</h2>
-      <form method="POST" action="{% url 'create_client' %}">
+      <span id="closeEditModal" class="close">&times;</span>
+      <h2>Edit Client</h2>
+      <form id="editClientForm" method="POST" action="">
         {% csrf_token %}
-        <label for="clientnom">Nom :</label>
-        <input type="text" class="form-control" id="clientnom" name="clientnom" required>
-
-        <label for="clientprenom">Prénom :</label>
-        <input type="text" class="form-control" id="clientprenom" name="clientprenom" required>
-
-        <label for="clientemail">Email :</label>
-        <input type="email" class="form-control" id="clientemail" name="clientemail" required>
-
-        <label for="clienttelephone">Téléphone :</label>
-        <input type="text" class="form-control" id="clienttelephone" name="clienttelephone" required>
-
-        <label for="clientadresse">Adresse :</label>
-        <input type="text" class="form-control" id="clientadresse" name="clientadresse" required>
-
-        <label for="clientdn">Date de naissance :</label>
-        <input type="date" class="form-control" id="clientdn" name="clientdn" required>
-
+        <input type="hidden" id="editClientId" name="clientid">
+        <label for="editClientnom">Nom :</label>
+        <input type="text" class="form-control" id="editClientnom" name="clientnom" required>
+        <label for="editClientprenom">Prénom :</label>
+        <input type="text" class="form-control" id="editClientprenom" name="clientprenom" required>
+        <label for="editClientemail">Email :</label>
+        <input type="email" class="form-control" id="editClientemail" name="clientemail" required>
+        <label for="editClientadresse">Adresse :</label>
+        <input type="text" class="form-control" id="editClientadresse" name="clientadresse" required>
+        <label for="editClientdn">Date de naissance :</label>
+        <input type="date" class="form-control" id="editClientdn" name="clientdn" required>
         <div class="form-buttons">
-
-          <a href="{% url 'clients' %}" class="btn btn-cancel">Annuler</a>
-          <button type="submit" class="btn btn-create">Submit</button>
+          <button type="submit" class="btn btn-create">Update</button>
+          <button type="button" id="cancelEdit" class="btn btn-cancel">Cancel</button>
         </div>
       </form>
     </div>
+  
   </div>
 
   <div id="editClientModal" class="modal">
@@ -130,9 +122,9 @@
   {% endif %}
 
   <style>
-    /* Styles pour la modale */
+    /* Styles for modals */
     .modal {
-      display: none; /* Caché par défaut */
+      display: none; /* Hidden by default */
       position: fixed;
       z-index: 1;
       left: 0;
@@ -140,7 +132,7 @@
       width: 100%;
       height: 100%;
       overflow: auto;
-      background-color: rgb(0,0,0);
+
       background-color: rgba(0,0,0,0.4);
     }
 
@@ -150,7 +142,7 @@
       padding: 20px;
       border: 1px solid #888;
       width: 80%;
-      max-width: 600px; /* Optionnel : définit une largeur maximale pour le modal */
+      max-width: 600px;
     }
 
     .close {
@@ -167,34 +159,10 @@
       cursor: pointer;
     }
 
-    /* Styles pour la disposition du header */
-    .header {
-      display: flex;
-      justify-content: space-between; /* Aligne le titre à gauche et le bouton à droite */
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .header h1 {
-      margin: 0;
-    }
-
-    /* Styles pour le formulaire */
-    form {
-      display: flex;
-      flex-direction: column; /* Aligne les éléments du formulaire en colonne */
-    }
-
-    label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input {
+    .message-container .message {
+      margin: 10px 0;
       padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      /* comm*/
     }
 
     .form-buttons {
@@ -336,45 +304,13 @@
         modal.style.display = "none";
       }
 
-      window.onclick = function(event) {
+    window.onclick = function(event) {
         if (event.target == modal) {
-          modal.style.display = "none";
+            modal.style.display = 'none';
         }
-      }
-    });
-    function delete_client(event) {
-    event.preventDefault(); // Empêche le comportement par défaut du lien
-    var clientId = event.currentTarget.getAttribute('data-client-id');
-    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    if (confirm('Are you sure you want to delete this client?')) {
-      fetch(`/delete_client/${clientId}/`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken
-        }
-      })
-      .then(response => {
-    if (response.ok) {
-        // Supprimer la ligne du tableau
-        event.currentTarget.closest('tr').remove();
-        //alert('Client deleted successfully.');
-    } else {
-        // Afficher les détails de l'erreur
-        response.text().then(errorText => {
-            alert(`An error occurred while deleting the client: ${errorText}`);
-        });
     }
-})
+});
 
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the client.');
-      });
-    }
-  }
-  
   </script>
   <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
   <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>

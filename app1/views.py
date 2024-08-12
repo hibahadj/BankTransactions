@@ -146,7 +146,6 @@ def LogoutPage(request):
     print("Session data flushed")
     return redirect('login')
 
-
 def AdminHomePage(request):
     # Check if the user is authenticated
     if 'is_authenticated' in request.session and request.session['is_authenticated']:
@@ -165,6 +164,7 @@ def AdminHomePage(request):
     else:
         print("User is not authenticated")
         return redirect('login')
+
 def ClientHomePage(request):
     # Check if the user is authenticated
     if request.session.get('is_authenticated'):
@@ -182,6 +182,7 @@ def ClientHomePage(request):
     else:
         print("Unauthorized access to client_home")
         return redirect('login')
+
 def CreateClient(request):
     print("Accessing CreateClient view")
     
@@ -243,4 +244,3 @@ def edit_client(request, client_id):
     return render(request, 'edit_client.html', {'form': form, 'client': client})
 
 
-   

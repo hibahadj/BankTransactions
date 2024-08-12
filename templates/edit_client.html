@@ -1,0 +1,96 @@
+<!-- edit_client.html -->
+{% extends 'admin_home.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Edit Client</h1>
+
+  <!-- Display messages if any -->
+  {% if messages %}
+  <div class="message-container">
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+ 
+  <!-- Example button to open modal (replace this with your actual implementation) -->
+  <button onclick="openEditClientModal({ client_instance })">Edit Client</button>
+</div>
+
+<!-- Include styles and scripts for modal -->
+<style>
+  /* Styles for modals */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+  }
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .message-container .message {
+    margin: 10px 0;
+    padding: 10px;
+  }
+  .message.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+</style>
+
+<script>
+  function openEditClientModal(client) {
+    document.getElementById('editClientId').value = client.clientid;
+    document.getElementById('editClientnom').value = client.clientnom;
+    document.getElementById('editClientprenom').value = client.clientprenom;
+    document.getElementById('editClientemail').value = client.clientemail;
+    document.getElementById('editClientadresse').value = client.clientadresse;
+    document.getElementById('editClientdn').value = client.clientdn;
+    document.getElementById('editClientModal').style.display = 'block';
+  }
+
+  document.getElementById('closeEditModal').onclick = function() {
+    document.getElementById('editClientModal').style.display = 'none';
+  };
+
+  document.getElementById('cancelEdit').onclick = function() {
+    document.getElementById('editClientModal').style.display = 'none';
+  };
+
+  // Close modal if clicked outside of the modal content
+  window.onclick = function(event) {
+    if (event.target == document.getElementById('editClientModal')) {
+      document.getElementById('editClientModal').style.display = 'none';
+    }
+  };
+</script>
+{% endblock %}
