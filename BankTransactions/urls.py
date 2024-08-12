@@ -35,7 +35,7 @@ urlpatterns = [
     path('create_client/', views.CreateClient, name='create_client'),
     path('delete_client/<int:client_id>/', delete_client, name='delete_client'),
     path('edit_client/<int:client_id>/',views.edit_client, name='edit_client'),
-
+    path('get_client_data/<int:client_id>/', views.get_client_data, name='get_client_data'),
 
 ]
 if settings.DEBUG:

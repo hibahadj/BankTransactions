@@ -145,7 +145,6 @@ def LogoutPage(request):
     print("Session data flushed")
     return redirect('login')
 
-
 def AdminHomePage(request):
     # Check if the user is authenticated
     if 'is_authenticated' in request.session and request.session['is_authenticated']:
@@ -164,6 +163,7 @@ def AdminHomePage(request):
     else:
         print("User is not authenticated")
         return redirect('login')
+
 def ClientHomePage(request):
     # Check if the user is authenticated
     if request.session.get('is_authenticated'):
@@ -181,6 +181,7 @@ def ClientHomePage(request):
     else:
         print("Unauthorized access to client_home")
         return redirect('login')
+
 def CreateClient(request):
     print("Accessing CreateClient view")
     
@@ -216,14 +217,30 @@ def CreateClient(request):
     print("Rendering CreateClient form")
     return render(request, 'create_client.html')  # Render a form for GET requests
 
+from django.http import JsonResponse
+
+def get_client_data(request, client_id):
+    client = get_object_or_404(Client, clientid=client_id)
+    client_data = {
+        'clientid': client.clientid,
+        'clientnom': client.clientnom,
+        'clientprenom': client.clientprenom,
+        'clientusername': client.clientusername,
+        'clientemail': client.clientemail,
+        'clientadresse': client.clientadresse,
+        'clientdn': client.clientdn.strftime('%Y-%m-%d'),  # Format date for HTML input
+    }
+    return JsonResponse(client_data)
+
+
 def edit_client(request, client_id):
     client = get_object_or_404(Client, clientid=client_id)
     if request.method == 'POST':
         form = ClientForm(request.POST, instance=client)
         if form.is_valid():
             form.save()
-            return redirect('clients')  # Remplace 'client_list' par le nom de ton URL pour la liste des clients
+            return redirect('clients')  # Redirect to the clients list
     else:
         form = ClientForm(instance=client)
-    return render(request, 'edit_client.html', {'form': form})
+    return render(request, 'edit_client.html', {'form': form, 'client': client})
 
