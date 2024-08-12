@@ -10,6 +10,10 @@ from app1.models import Client, Admin
 from django.contrib.auth.hashers import check_password
 
 from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 
@@ -34,8 +38,8 @@ class ListeClientsView(ListView):
     model = Client
     template_name = 'liste_clients.html'
     context_object_name = 'clients'
-
     
+
 
 class ListeComptesView(TemplateView):
     template_name = 'liste_comptes.html'
@@ -45,6 +49,18 @@ class ListeTransactionsView(TemplateView):
 
 class InfoPersonelsView(TemplateView):
     template_name = 'info_personels.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'user_id' in self.request.session:
+            try:
+                admin_user = Admin.objects.get(pk=self.request.session['user_id'])
+                context['admin'] = admin_user
+            except Admin.DoesNotExist:
+                context['admin'] = None
+        else:
+            context['admin'] = None
+        return context
 
 def authenticate_custom_user(username, password):
     print(f"Authenticating user: {username}")
@@ -198,6 +214,7 @@ def CreateClient(request):
 
     print("Rendering CreateClient form")
     return render(request, 'create_client.html')  # Render a form for GET requests
+    
 
 
    
