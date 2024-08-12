@@ -7,11 +7,11 @@
     <button id="openModal" class="btn btn-create"> <i class="fa-solid fa-plus"></i> Create New Client</button>
   </div>
 
-    <!-- Search Bar -->
-<div class="search-container">
-  <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
-  <i class="fa fa-search search-icon"></i>
-</div>
+  <!-- Search Bar -->
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
+    <i class="fa fa-search search-icon"></i>
+  </div>
 
   <table class="table" id="clientTable">
     <thead>
@@ -27,33 +27,30 @@
         <th>Actions</th>
       </tr>
     </thead>
-    
-      <tbody>
-        {% for client in clients %}
-        <tr>
-          <td>{{ client.clientid }}</td>
-          <td>{{ client.clientnom }}</td>
-          <td>{{ client.clientprenom }}</td>
-          <td>{{ client.clientusername }}</td>
-          <td>{{ client.clientemail }}</td>
-          <td>{{ client.clientadresse }}</td>
-          <td>{{ client.clientdn }}</td>
-          <td>
-            <a href="#" class="action-icon" title="View Accounts">
-              <i class="fa-solid fa-user"></i>
-            </a>
-            <a href="#" class="action-icon" title="Edit">
-              <i class="fa-solid fa-pen"></i>
-            </a>
-            <form method="POST" action="{% url 'delete_client' client.clientid %}" style="display:inline;" class="delete-client-form" onclick="return confirm('Are you sure you want to delete this client?');">
-              {% csrf_token %}
-              <button type="submit" class="action-icon" title="Delete">
-                  <i class="fa-solid fa-minus"></i>
-              </button>
+
+    <tbody>
+      {% for client in clients %}
+      <tr>
+        <td>{{ client.clientid }}</td>
+        <td>{{ client.clientnom }}</td>
+        <td>{{ client.clientprenom }}</td>
+        <td>{{ client.clientusername }}</td>
+        <td>{{ client.clientemail }}</td>
+        <td>{{ client.clientadresse }}</td>
+        <td>{{ client.clientdn }}</td>
+        <td>
+          <a href="#" class="action-icon edit-client" data-client-id="{{ client.clientid }}" title="Edit">
+            <i class="fa-solid fa-pen"></i>
+          </a>
+          <form method="POST" action="{% url 'delete_client' client.clientid %}" style="display:inline;" class="delete-client-form" onclick="return confirm('Are you sure you want to delete this client?');">
+            {% csrf_token %}
+            <button type="submit" class="action-icon" title="Delete">
+              <i class="fa-solid fa-minus"></i>
+            </button>
           </form>
-          </td>
-        </tr>
-      
+        </td>
+      </tr>
+
       {% empty %}
       <tr>
         <td colspan="8">No clients available.</td>
@@ -62,51 +59,37 @@
     </tbody>
   </table>
 
-  <!-- Modal -->
-  <div id="clientModal" class="modal">
+  <!-- Modal for editing client -->
+  <div id="editClientModal" class="modal">
     <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h2>Veillez remplir les informations</h2>
-      <form method="POST" action="{% url 'create_client' %}">
+      <span id="closeEditModal" class="close">&times;</span>
+      <h2>Edit Client</h2>
+      <form id="editClientForm" method="POST" action="#">
         {% csrf_token %}
-        <label for="clientnom">Nom :</label>
-        <input type="text" class="form-control" id="clientnom" name="clientnom" required>
-
-        <label for="clientprenom">Prénom :</label>
-        <input type="text" class="form-control" id="clientprenom" name="clientprenom" required>
-
-        <label for="clientemail">Email :</label>
-        <input type="email" class="form-control" id="clientemail" name="clientemail" required>
-
-        <label for="clienttelephone">Téléphone :</label>
-        <input type="text" class="form-control" id="clienttelephone" name="clienttelephone" required>
-
-        <label for="clientadresse">Adresse :</label>
-        <input type="text" class="form-control" id="clientadresse" name="clientadresse" required>
-
-        <label for="clientdn">Date de naissance :</label>
-        <input type="date" class="form-control" id="clientdn" name="clientdn" required>
-
+        <input type="hidden" id="editClientId" name="clientid">
+        <label for="editClientnom">Nom :</label>
+        <input type="text" class="form-control" id="editClientnom" name="clientnom" required>
+        <label for="editClientprenom">Prénom :</label>
+        <input type="text" class="form-control" id="editClientprenom" name="clientprenom" required>
+        <label for="editClientemail">Email :</label>
+        <input type="email" class="form-control" id="editClientemail" name="clientemail" required>
+        <label for="editClientadresse">Adresse :</label>
+        <input type="text" class="form-control" id="editClientadresse" name="clientadresse" required>
+        <label for="editClientdn">Date de naissance :</label>
+        <input type="date" class="form-control" id="editClientdn" name="clientdn" required>
         <div class="form-buttons">
-
-          <a href="{% url 'clients' %}" class="btn btn-cancel">Annuler</a>
-          <button type="submit" class="btn btn-create">Submit</button>
+          <button type="submit" class="btn btn-create">Update</button>
+          <button type="button" id="cancelEdit" class="btn btn-cancel">Cancel</button>
         </div>
       </form>
     </div>
+  
   </div>
-  {% if messages %}
-  <div class="success-dialogue">
-    {% for message in messages %}
-      <p>{{ message }}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
-
+  <!-- Include styles and scripts for modal -->
   <style>
-    /* Styles pour la modale */
+    /* Styles for modals */
     .modal {
-      display: none; /* Caché par défaut */
+      display: none; /* Hidden by default */
       position: fixed;
       z-index: 1;
       left: 0;
@@ -114,7 +97,7 @@
       width: 100%;
       height: 100%;
       overflow: auto;
-      background-color: rgb(0,0,0);
+
       background-color: rgba(0,0,0,0.4);
     }
 
@@ -124,7 +107,7 @@
       padding: 20px;
       border: 1px solid #888;
       width: 80%;
-      max-width: 600px; /* Optionnel : définit une largeur maximale pour le modal */
+      max-width: 600px;
     }
 
     .close {
@@ -141,218 +124,66 @@
       cursor: pointer;
     }
 
-    /* Styles pour la disposition du header */
-    .header {
-      display: flex;
-      justify-content: space-between; /* Aligne le titre à gauche et le bouton à droite */
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .header h1 {
-      margin: 0;
-    }
-
-    /* Styles pour le formulaire */
-    form {
-      display: flex;
-      flex-direction: column; /* Aligne les éléments du formulaire en colonne */
-    }
-
-    label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input {
+    .message-container .message {
+      margin: 10px 0;
       padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      /* comm*/
     }
-
-    .form-buttons {
-      display: flex;
-      justify-content: space-between; /* Aligne les boutons de soumission et d'annulation */
-      margin-top: 20px;
+    .message.success {
+      background-color: #d4edda;
+      color: #155724;
     }
-
-    .success-dialogue {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #79e988;
-      color: #0b2509;
-      border: 1px solid rgb(13, 107, 29);
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
+    .message.error {
+      background-color: #f8d7da;
+      color: #721c24;
     }
-
-    /* Styles pour les icônes d'action */
-    .action-icon {
-  text-decoration: none;
-  color: #333;
-  margin: 0 5px;
-  font-size: 1.2em;
-  display: inline-block; /* Assure que les icônes sont affichées correctement */
-}
-
-.action-icon:hover {
-  color: #007bff;
-}
-
-.search-container {
-  display: flex;
-  align-items: center; /* Aligns items vertically in the center */
-  position: relative; /* Allows absolute positioning of the icon */
-  width: 100%; /* Adjust as needed */
-  max-width: 400px; /* Adjust the max-width as needed */
-}
-
-.search-bar {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #11216f;
-  border-radius: 4px;
-  width: 100%;
-}
-
-.search-icon {
-  position: absolute;
-  right: 10px;
-  top: 57%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  color: #666;
-}
-
-.search-icon.hidden {
-  opacity: 0; /* Hide the icon */
-  pointer-events: none; /* Prevent clicking */
-}
 
   </style>
 
   <script>
-    // JavaScript pour ouvrir et fermer la modale
-    document.addEventListener('DOMContentLoaded', function() {
-      var modal = document.getElementById("clientModal");
-      var btn = document.getElementById("openModal");
-      var span = document.getElementById("closeModal");
 
-      btn.onclick = function() {
-        modal.style.display = "block";
+    document.addEventListener('DOMContentLoaded', function() {
+      var modal = document.getElementById("editClientModal");
+      var closeBtn = document.getElementById("closeEditModal");
+      var cancelBtn = document.getElementById("cancelEdit");
+      var editLinks = document.querySelectorAll('.edit-client');
+
+      function openEditModal(clientId) {
+        fetch(`/get_client_data/${clientId}/`)
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('editClientId').value = data.clientid;
+            document.getElementById('editClientnom').value = data.clientnom;
+            document.getElementById('editClientprenom').value = data.clientprenom;
+            document.getElementById('editClientemail').value = data.clientemail;
+            document.getElementById('editClientadresse').value = data.clientadresse;
+            document.getElementById('editClientdn').value = data.clientdn;
+            document.getElementById('editClientForm').action = `{% url 'edit_client' 0 %}`.replace('0', data.clientid);
+            modal.style.display = 'block';
+          });
       }
 
-      span.onclick = function() {
-        modal.style.display = "none";
+      closeBtn.onclick = function() {
+        modal.style.display = 'none';
+      }
+
+      cancelBtn.onclick = function() {
+        modal.style.display = 'none';
       }
 
       window.onclick = function(event) {
         if (event.target == modal) {
-          modal.style.display = "none";
+          modal.style.display = 'none';
         }
       }
-    });
-    function delete_client(event) {
-    event.preventDefault(); // Empêche le comportement par défaut du lien
-    var clientId = event.currentTarget.getAttribute('data-client-id');
-    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    if (confirm('Are you sure you want to delete this client?')) {
-      fetch(`/delete_client/${clientId}/`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken
-        }
-      })
-      .then(response => {
-    if (response.ok) {
-        // Supprimer la ligne du tableau
-        event.currentTarget.closest('tr').remove();
-        //alert('Client deleted successfully.');
-    } else {
-        // Afficher les détails de l'erreur
-        response.text().then(errorText => {
-            alert(`An error occurred while deleting the client: ${errorText}`);
+
+      editLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          var clientId = this.getAttribute('data-client-id');
+          openEditModal(clientId);
         });
-    }
-})
-
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the client.');
       });
-    }
-  }
-  
-  </script>
-  <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
-  <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
-  <script>
-    // JavaScript to set the max date to today
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get today's date in the format YYYY-MM-DD
-        var today = new Date().toISOString().split('T')[0];
-        
-        // Set the max attribute of the date input
-        document.getElementById('clientdn').setAttribute('max', today);
     });
-    </script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var searchInput = document.getElementById('searchInput');
-  var searchIcon = document.querySelector('.search-icon');
-  var table = document.getElementById('clientTable');
-  var tr = table.getElementsByTagName('tr');
-
-  // Function to toggle the visibility of the search icon
-  function toggleIconVisibility() {
-    if (searchInput.value.trim() === '') {
-      searchIcon.classList.remove('hidden');
-    } else {
-      searchIcon.classList.add('hidden');
-    }
-  }
-
-  // Event listener for filtering the client list
-  searchInput.addEventListener('keyup', function() {
-    var filter = searchInput.value.toLowerCase();
-
-    for (var i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
-      var tdId = tr[i].getElementsByTagName('td')[0];
-      var tdNom = tr[i].getElementsByTagName('td')[1];
-      var tdPrenom = tr[i].getElementsByTagName('td')[2];
-      if (tdId || tdNom || tdPrenom) {
-        var idValue = tdId.textContent || tdId.innerText;
-        var nomValue = tdNom.textContent || tdNom.innerText;
-        var prenomValue = tdPrenom.textContent || tdPrenom.innerText;
-        if (idValue.toLowerCase().indexOf(filter) > -1 || 
-            nomValue.toLowerCase().indexOf(filter) > -1 || 
-            prenomValue.toLowerCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-
-    // Toggle icon visibility based on input value
-    toggleIconVisibility();
-  });
-
-  // Initial check to ensure the icon is visible if the input is empty
-  toggleIconVisibility();
-});
-
-</script> 
-
-</div>
-{% endblock %}
+  </script>
+ {% endblock %}

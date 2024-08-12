@@ -34,6 +34,7 @@ urlpatterns = [
     #path('change-password/', CustomPasswordChangeView.as_view(), name='change_password'),
     path('create_client/', views.CreateClient, name='create_client'),
     path('delete_client/<int:client_id>/', delete_client, name='delete_client'),
+    path('edit_client/<int:client_id>/',views.edit_client, name='edit_client'),
 
 
 ]
