@@ -46,6 +46,9 @@ class ListeClientsView(ListView):
 class ListeComptesView(TemplateView):
     template_name = 'liste_comptes.html'
 
+class SettingsView(TemplateView):
+    template_name = 'settings.html'
+
 class ListeTransactionsView(TemplateView):
     template_name = 'liste_transactions.html'
 
