@@ -1,9 +1,257 @@
-{% extends "admin_home.html" %}
-
-{% block title %}Liste Comptes{% endblock %}
+{% extends 'admin_home.html' %}
 
 {% block content %}
-<h1>Liste Comptes</h1>
-<p>Content for Liste Comptes goes here.</p>
-<!-- Add your accounts list content here -->
+<div class="container">
+  <div class="header">
+    <h1>accounts List</h1>
+
+    <button id="openModal" class="btn btn-create">
+      <i class="fa-solid fa-plus"></i> Create New account
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search by ID" class="form-control search-bar">
+    <i class="fa fa-search search-icon"></i>
+  </div>
+
+  <table class="table" id="compteTable">
+    <thead>
+      <tr>
+        <th>IDcompte</th>
+        <th>Client Username</th>
+        <th>Solde</th>
+        <th>Devise</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for compte in comptes %}
+      <tr>
+        <td>{{ compte.compteid }}</td>
+        <td>{{ compte.client }}</td>
+        <td>{{ compte.comptesolde }}</td>
+        <td>{{ compte.comptedevise }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No accounts available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Modal for Creating New Account -->
+  <div id="CompteModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h2>Veillez remplir les informations</h2>
+      <form method="POST" action="{% url 'Create_Compte' %}">
+        {% csrf_token %}
+        <label for="compteid">Compte ID :</label>
+        <input type="text" class="form-control" id="compteid" name="compteid" readonly>
+
+        <label for="client">Client :</label>
+        <input type="text" class="form-control" id="client" name="client" required>
+        
+
+        <label for="comptesolde">Solde :</label>
+        <input type="number" step="0.01" class="form-control" id="comptesolde" name="comptesolde" required>
+
+        <label for="comptedevise">Devise :</label>
+        <input type="text" class="form-control" id="comptedevise" name="comptedevise" required>
+
+        <div class="form-buttons">
+          <a href="{% url 'comptes' %}" class="btn btn-cancel">Annuler</a>
+          <button type="submit" class="btn btn-create">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  {% if messages %}
+  <div class="success-dialogue">
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <style>
+    .modal {
+      display: none; /* Caché par défaut */
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .success-dialogue {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #79e988;
+      color: #0b2509;
+      border: 1px solid rgb(13, 107, 29);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+
+    .action-icon {
+      text-decoration: none;
+      color: #333;
+      margin: 0 5px;
+      font-size: 1.2em;
+      display: inline-block;
+    }
+
+    .action-icon:hover {
+      color: #007bff;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .search-bar {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #11216f;
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 10px;
+      top: 57%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: #666;
+    }
+
+    .search-icon.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Modal for Creating New Account
+      var createModal = document.getElementById("CompteModal");
+      var openModalBtn = document.getElementById("openModal");
+      var closeCreateModal = document.getElementById("closeModal");
+
+      openModalBtn.onclick = function() {
+        createModal.style.display = "block";
+      }
+
+      closeCreateModal.onclick = function() {
+        createModal.style.display = "none";
+      }
+
+      window.onclick = function(event) {
+        if (event.target == createModal) {
+          createModal.style.display = "none";
+        }
+      }
+
+
+      // Search functionality
+      var searchInput = document.getElementById('searchInput');
+      var table = document.getElementById('compteTable');
+      var rows = table.getElementsByTagName('tr');
+
+      searchInput.addEventListener('input', function() {
+        var filter = searchInput.value.toUpperCase();
+
+        for (var i = 1; i < rows.length; i++) {
+          var cells = rows[i].getElementsByTagName('td');
+          var found = false;
+
+          for (var j = 0; j < cells.length; j++) {
+            if (cells[j].textContent.toUpperCase().indexOf(filter) > -1) {
+              found = true;
+              break;
+            }
+          }
+
+          rows[i].style.display = found ? '' : 'none';
+        }
+      });
+    });
+  </script>
+</div>
 {% endblock %}

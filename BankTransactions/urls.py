@@ -37,7 +37,10 @@ urlpatterns = [
     path('delete_client/<int:client_id>/', delete_client, name='delete_client'),
     path('edit_client/<int:client_id>/',views.edit_client, name='edit_client'),
     path('get_client_data/<int:client_id>/', views.get_client_data, name='get_client_data'),
-
+    path('Create_Compte/', views.CreateCompte, name='Create_Compte'),
+    path('delete_compte/<int:clientid>/', views.delete_compte, name='delete_compte'),
+    path('edit_compte/<int:clientid>/',views.edit_compte, name='edit_compte'),
+    path('get_compte_data/<int:clientid>/', views.get_compte_data, name='get_compte_data'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

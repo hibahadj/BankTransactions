@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import csrf_protect
-from app1.models import Client, Admin
+from app1.models import Client, Admin ,Compte
 from django.contrib.auth.hashers import check_password
 
 from django.shortcuts import get_object_or_404, redirect
@@ -46,6 +46,10 @@ class ListeClientsView(ListView):
 class ListeComptesView(TemplateView):
     template_name = 'liste_comptes.html'
 
+class ListeComptesView(ListView):
+    model = Compte
+    template_name = 'liste_comptes.html'
+    context_object_name = 'comptes'
 class SettingsView(TemplateView):
     template_name = 'settings.html'
 
@@ -221,6 +225,7 @@ def CreateClient(request):
     print("Rendering CreateClient form")
     return render(request, 'create_client.html')  # Render a form for GET requests
     
+
 def get_client_data(request, client_id):
     client = get_object_or_404(Client, clientid=client_id)
     client_data = {
@@ -246,4 +251,78 @@ def edit_client(request, client_id):
         form = ClientForm(instance=client)
     return render(request, 'edit_client.html', {'form': form, 'client': client})
 
+def edit_compte(request, compteid):
+    compte = get_object_or_404(Compte, compteid=compteid)
+    if request.method == 'POST':
+        form = CompteForm(request.POST, instance=compte)
+        if form.is_valid():
+            form.save()
+            return redirect('comptes')  # Replace with your success URL
+    else:
+        form = CompteForm(instance=compte)
+    return render(request, 'edit_compte.html', {'form': form})
 
+
+def get_compte_data(request, compteid):
+    compte = get_object_or_404(Compte, compteid=compteid)
+    compte_data = {
+        'compteid': compte.compteid,
+        'client': compte.client.clientid,  # Assuming you want to include client ID, adjust as needed
+        'comptesolde': str(compte.comptesolde),  # Convert to string for consistent JSON format
+        'comptedevise': compte.comptedevise,
+    }
+    return JsonResponse(compte_data)
+
+def CreateCompte(request):
+    print("Accessing CreateCompte view")
+    
+    # Check if the user is authenticated
+    if not request.session.get('is_authenticated'):
+        print("Unauthorized access to CreateCompte")
+        return redirect('login')
+
+    # Proceed if the user is authenticated
+    if request.method == 'POST':
+        compteid = request.POST.get('compteid')
+        clientid = request.POST.get('client')  # Notez que le nom du champ est 'client'
+        comptesolde = request.POST.get('comptesolde')
+        comptedevise = request.POST.get('comptedevise')
+        
+        print(f"Creating compte for client ID: {clientid}")
+        
+        # Retrieve the client object
+        try:
+            client = get_object_or_404(Client, clientid=clientid)
+        except Client.DoesNotExist:
+            messages.error(request, 'Client does not exist.')
+            return redirect('comptes')
+        
+        # Create and save the Compte object
+        compte = Compte(
+            client=client,
+            comptesolde=comptesolde,
+            comptedevise=comptedevise
+        )
+        compte.save()
+        print(f"Compte created with ID: {compte.pk}")
+        messages.success(request, "Compte created successfully.")
+        return redirect('comptes')  # Redirect to the list of comptes
+
+    print("Rendering CreateCompte form")
+    return render(request, 'create_compte.html')  # Render a form for GET requests
+
+def delete_compte(request, compteid):
+    if request.method == 'POST':
+        try:
+            # Retrieve the Compte object based on the compte_id
+            compte = get_object_or_404(Compte, compteid=compteid)
+            compte.delete()
+            messages.success(request, "Compte deleted successfully.")
+        except Compte.DoesNotExist:
+            messages.error(request, 'Compte does not exist.')
+        except Exception as e:
+            messages.error(request, f'An error occurred while deleting the compte: {str(e)}')
+    else:
+        messages.error(request, 'Invalid request method. Please use POST.')
+    
+    return redirect('comptes')  # Redirect to the list of comptes
