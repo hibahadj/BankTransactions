@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import csrf_protect
 from app1.models import Client, Admin
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.views import PasswordChangeView
@@ -229,6 +229,7 @@ def get_client_data(request, client_id):
         'clientprenom': client.clientprenom,
         'clientusername': client.clientusername,
         'clientemail': client.clientemail,
+        'clienttelephone': client.clienttelephone,
         'clientadresse': client.clientadresse,
         'clientdn': client.clientdn.strftime('%Y-%m-%d'),  # Format date for HTML input
     }
@@ -245,5 +246,30 @@ def edit_client(request, client_id):
     else:
         form = ClientForm(instance=client)
     return render(request, 'edit_client.html', {'form': form, 'client': client})
+
+@csrf_protect
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if 'user_id' in request.session:
+            admin_user = Admin.objects.get(pk=request.session['user_id'])
+
+            if not check_password(current_password, admin_user.adminpassword):
+                messages.error(request, "Current password is incorrect.")
+                return redirect('settings')
+
+            if new_password != confirm_password:
+                messages.error(request, "New password and confirmation do not match.")
+                return redirect('settings')
+
+            # Update the password
+            admin_user.set_password(new_password)
+            messages.success(request, "Password updated successfully.")
+            return redirect('settings')
+    
+    return redirect('settings')
 
 

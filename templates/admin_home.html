@@ -109,11 +109,10 @@
 
     /* Sidebar styles */
     .sidebar {
-      position: fixed; /* Fixed position to stay in place */
+
       top: 56px; /* Space for the navbar */
       left: 0;
-      height: calc(100% - 56px); /* Full height minus the navbar height */
-      width: 0;
+      width: 0px;
       background-color: #11216f; /* Same as navbar */
       padding: 0; /* Remove padding to align with the top and left border */
       border-right: 1px solid #ddd;
@@ -157,6 +156,10 @@
       margin-left: 60px; /* Move content slightly to the right when sidebar is hidden */
     }
 
+    .sidebar.open + .content {
+      margin-left: 0px; /* Move content slightly to the right when sidebar is hidden */
+    }
+
   
     .sidebar.open {
       width: 250px;
@@ -178,6 +181,39 @@
       text-align: center;
       padding: 10px 0;
     }
+
+    .success-dialogue {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #79e988;
+      color: #0b2509;
+      border: 1px solid rgb(13, 107, 29);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+
+    .error-dialogue {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid red;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+    .error-dialogue p {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -187,7 +223,9 @@
       <img src="{% static 'images/logo_cpa1.png' %}" alt="Logo" style="height: 40px;">
       
       <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-
+      <div class="navbar-text ml-3">
+    
+      </div>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -250,9 +288,18 @@
       const sidebar = document.querySelector('.sidebar');
       const content = document.querySelector('.content');
       const toggleBtn = document.querySelector('.toggle-btn');
-    
-      // Restore sidebar state on page load
-      if (localStorage.getItem('sidebarState') === 'open') {
+      
+      // Check if the sidebarState is already set in localStorage
+      let sidebarState = localStorage.getItem('sidebarState');
+      
+      // If no sidebarState is found in localStorage, set it to 'open' by default
+      if (!sidebarState) {
+        localStorage.setItem('sidebarState', 'open');
+        sidebarState = 'open';
+      }
+      
+      // Apply the sidebar state based on the value in localStorage
+      if (sidebarState === 'open') {
         sidebar.classList.add('open');
         content.classList.add('shift');
         sidebar.classList.remove('hidden');
@@ -261,17 +308,18 @@
         content.classList.remove('shift');
         sidebar.classList.add('hidden');
       }
-    
+      
       // Reveal sidebar and content after the state is set
       sidebar.style.visibility = 'visible';
       content.style.visibility = 'visible';
-    
-      // Re-enable transitions after initial state
+      
+      // Re-enable transitions after the initial state
       setTimeout(() => {
         sidebar.style.transition = '';
         content.style.transition = '';
       }, 0);
-    
+      
+      // Toggle button click event
       toggleBtn.addEventListener('click', function() {
         if (sidebar.classList.contains('open')) {
           sidebar.classList.remove('open');

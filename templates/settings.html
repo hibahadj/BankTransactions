@@ -1,7 +1,172 @@
 {% extends "admin_home.html" %}
 
 {% block content %}
-<h1>settings</h1>
-<p>Content for settings goes here.</p>
-<!-- Add your accounts list content here -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <i class="fa-solid fa-lock"></i>
+                    <a href="#" id="openModal">Changer le Mot de Passe</a>
+                </li>
+                <li class="list-group-item">
+                    <i class="fa-solid fa-globe"></i>
+                    <a href="#">Language</a>
+                </li>
+                <li class="list-group-item">
+                    <i class="fa-solid fa-laptop"></i>
+                    <a href="#">Appareil</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="changePasswordModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 class="modal-title">Changer Le Mot De Passe</h3>
+        <form method="post" action="{% url 'change_password' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="current_password">Ancient Mot De Passe</label>
+                <input type="password" id="current_password" name="current_password" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">Nouveau Mot De Passe</label>
+                <input type="password" id="new_password" name="new_password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirmer Nouveau Mot De Passe</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            <div class="form-buttons">
+                <button type="button" id="cancelModal" class="btn btn-cancel">Annuler</button>
+                <button type="submit" class="btn btn-create">Confirmer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-dialogue">
+                <p>{{ message }}</p>
+            </div>
+        {% elif message.tags == 'error' %}
+            <div class="error-dialogue">
+                <p>{{ message }}</p>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+<style>
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Caché par défaut */
+      position: fixed;
+      z-index: 3;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+    }
+
+    /* Close button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        padding-bottom: 15px;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: space-between; /* Aligne les boutons de soumission et d'annulation */
+      margin-top: 20px;
+    }
+
+    .modal-title {
+      margin-bottom: 30px; /* Adjust this value as needed */
+      
+    }
+
+    /* Styles pour les icônes d'action */
+    .action-icon {
+      text-decoration: none;
+      color: #333;
+      margin: 0 5px;
+      font-size: 1.2em;
+      display: inline-block; /* Assure que les icônes sont affichées correctement */
+    }
+
+    .action-icon:hover {
+     color: #007bff;
+    }
+</style>
+    <script>
+        // Get the modal
+        var modal = document.getElementById("changePasswordModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("openModal");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // Get the cancel button that also closes the modal
+        var cancelBtn = document.getElementById("cancelModal");
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+        modal.style.display = "none";
+        }
+
+        // When the user clicks the cancel button, close the modal
+        cancelBtn.onclick = function() {
+        modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal content, close the modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        // When the user clicks the cancel button, close the modal
+        cancelBtn.onclick = function() {
+        modal.style.display = "none";
+        }
+    </script>
+
 {% endblock %}
