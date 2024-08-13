@@ -6,8 +6,8 @@ from django.utils import timezone
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import csrf_protect
-from app1.models import Client, Admin ,Compte
-from django.contrib.auth.hashers import check_password
+from app1.models import Client, Admin, Compte
+from django.contrib.auth.hashers import check_password, make_password
 
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.views import PasswordChangeView
@@ -234,6 +234,7 @@ def get_client_data(request, client_id):
         'clientprenom': client.clientprenom,
         'clientusername': client.clientusername,
         'clientemail': client.clientemail,
+        'clienttelephone': client.clienttelephone,
         'clientadresse': client.clientadresse,
         'clientdn': client.clientdn.strftime('%Y-%m-%d'),  # Format date for HTML input
     }
@@ -261,6 +262,31 @@ def edit_compte(request, compteid):
     else:
         form = CompteForm(instance=compte)
     return render(request, 'edit_compte.html', {'form': form})
+@csrf_protect
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if 'user_id' in request.session:
+            admin_user = Admin.objects.get(pk=request.session['user_id'])
+
+            if not check_password(current_password, admin_user.adminpassword):
+                messages.error(request, "Current password is incorrect.")
+                return redirect('settings')
+
+            if new_password != confirm_password:
+                messages.error(request, "New password and confirmation do not match.")
+                return redirect('settings')
+
+            # Update the password
+            admin_user.set_password(new_password)
+            messages.success(request, "Password updated successfully.")
+            return redirect('settings')
+    
+    return redirect('settings')
+
 
 
 def get_compte_data(request, compteid):

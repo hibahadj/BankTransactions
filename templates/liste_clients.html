@@ -21,6 +21,7 @@
         <th>Prénom</th>
         <th>Username</th>
         <th>Email</th>
+        <th>Téléphone</th>
         <th>Address</th>
 
         <th>Date de naissance</th>
@@ -36,6 +37,7 @@
           <td>{{ client.clientprenom }}</td>
           <td>{{ client.clientusername }}</td>
           <td>{{ client.clientemail }}</td>
+          <td>{{ client.clienttelephone }}</td>
           <td>{{ client.clientadresse }}</td>
           <td>{{ client.clientdn }}</td>
           <td>
@@ -94,7 +96,7 @@
         </div>
       </form>
     </div>
-    
+
   </div>
 
   <div id="editClientModal" class="modal">
@@ -110,6 +112,8 @@
         <input type="text" class="form-control" id="editClientprenom" name="clientprenom" required>
         <label for="editClientemail">Email :</label>
         <input type="email" class="form-control" id="editClientemail" name="clientemail" required>
+        <label for="editClienttelephone">Téléphone :</label>
+        <input type="text" class="form-control" id="editClienttelephone" name="clienttelephone" required>
         <label for="editClientadresse">Adresse :</label>
         <input type="text" class="form-control" id="editClientadresse" name="clientadresse" required>
         <label for="editClientdn">Date de naissance :</label>
@@ -122,20 +126,27 @@
     </div>
   
   </div>
-  {% if messages %}
-  <div class="success-dialogue">
-    {% for message in messages %}
-      <p>{{ message }}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
+
+{% if messages %}
+  {% for message in messages %}
+      {% if message.tags == 'success' %}
+          <div class="success-dialogue">
+              <p>{{ message }}</p>
+          </div>
+      {% elif message.tags == 'error' %}
+          <div class="error-dialogue">
+              <p>{{ message }}</p>
+          </div>
+      {% endif %}
+  {% endfor %}
+{% endif %}
 
   <style>
     /* Styles pour la modale */
     .modal {
       display: none; /* Caché par défaut */
       position: fixed;
-      z-index: 1;
+      z-index: 3;
       left: 0;
       top: 0;
       width: 100%;
@@ -204,20 +215,7 @@
       margin-top: 20px;
     }
 
-    .success-dialogue {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #79e988;
-      color: #0b2509;
-      border: 1px solid rgb(13, 107, 29);
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-    }
+    
 
     /* Styles pour les icônes d'action */
     .action-icon {
@@ -273,6 +271,7 @@
         
         // Set the max attribute of the date input
         document.getElementById('clientdn').setAttribute('max', today);
+        document.getElementById('editClientdn').setAttribute('max', today);
     });
   </script>
 
@@ -292,6 +291,7 @@
                     document.getElementById('editClientnom').value = data.clientnom;
                     document.getElementById('editClientprenom').value = data.clientprenom;
                     document.getElementById('editClientemail').value = data.clientemail;
+                    document.getElementById('editClienttelephone').value = data.clienttelephone;
                     document.getElementById('editClientadresse').value = data.clientadresse;
                     document.getElementById('editClientdn').value = data.clientdn;
                     modal.style.display = 'block';
