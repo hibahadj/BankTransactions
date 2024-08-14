@@ -9,12 +9,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <!-- Font Awesome CSS for social media icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 
   <!-- Load static files -->
   {% load static %}
 
-  <title>Home Page</title>
+  <title>Client Home Page</title>
 
   <style>
     /* Custom styles */
@@ -41,6 +41,22 @@
       background-color: #e6b800; /* Darker yellow on hover */
     }
 
+    .btn-create {
+      color: #ffffff; /* Black text color for contrast */
+      border: 1px solid #000000; /* Yellow border */
+      background-color: #11216f; /* Yellow background */
+    }
+    .btn-create:hover {
+      background-color: #11216f; /* Darker yellow on hover */
+    }
+    .btn-cancel {
+      background-color: #f44336; /* Rouge */
+      color: white;
+    }
+
+    .btn-cancel:hover {
+      background-color: #e53935;
+    }
     .social-icons a {
       color: #ffffff;
       margin-left: 10px;
@@ -50,6 +66,33 @@
     .social-icons a:hover {
       color: #d3d3d3;
     }
+
+    .my-icons a {
+      color: #f3df00;
+      margin-right: 05px;
+      font-size: 20px;
+      transition: color 0.3s;
+    }
+    .my-icons a:hover {
+      color: #ffffff;
+    }
+
+    /* Toggle button styles */
+    .toggle-btn {
+      background-color: #11216f; /* Same color as sidebar */
+      color: #ffcc00;
+      border: none;
+      width: 35px; /* Adjust size as needed */
+      height: 35px; /* Adjust size as needed */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px; /* Adjust icon size as needed */
+      cursor: pointer;
+      z-index: 3; /* Ensure it's above the content and sidebar */
+      margin-left: 09px;
+    }
+
 
     /* Flexbox container */
     .container-flex {
@@ -61,16 +104,22 @@
     .main-content {
       flex: 1; /* Take up remaining space */
       display: flex;
+      position: relative;
     }
 
     /* Sidebar styles */
     .sidebar {
-      flex: 0 0 250px; /* Fixed width for sidebar */
+
+      top: 56px; /* Space for the navbar */
+      left: 0;
+      width: 0px;
       background-color: #11216f; /* Same as navbar */
       padding: 0; /* Remove padding to align with the top and left border */
       border-right: 1px solid #ddd;
       display: flex;
       flex-direction: column;
+      transition: width 0.3s;
+      z-index: 2; /* Ensure the sidebar is above content */
     }
     .sidebar a {
       padding: 10px 15px; /* Adjust padding to ensure alignment with the border */
@@ -82,14 +131,47 @@
       background-color: #e9ecef;
       color: #000;
     }
-    .page-1 {
-      color: #ff0000; /* Change the color for Page 1 */
+
+    .sidebar .nav-link {
+      color: #ffffff;
+      font-weight:normal; /* Bold font for links */
+      display: block; /* Block display for better layout */
+      padding: 10px 15px; /* Padding for spacing */
+      border-radius: 5px; /* Rounded corners */
+      transition: background-color 0.3s; /* Smooth background color transition */
+    }
+    .sidebar .nav-link:hover {
+      background-color: #0a0f4f; /* Darker navy blue on hover */
     }
 
     .content {
       flex: 1;
       padding: 20px;
       overflow-y: auto; /* Add scroll if content is too long */
+      margin-left: 0; /* Start without margin */
+      transition: margin-left 0.3s; /* Smooth transition when sidebar opens */
+    }
+
+    .sidebar.hidden + .content {
+      margin-left: 60px; /* Move content slightly to the right when sidebar is hidden */
+    }
+
+    .sidebar.open + .content {
+      margin-left: 0px; /* Move content slightly to the right when sidebar is hidden */
+    }
+
+  
+    .sidebar.open {
+      width: 250px;
+    }
+
+    .content.shift {
+      margin-left: 250px;
+    }
+
+    .sidebar, .content {
+     visibility: hidden;
+     transition: none; /* Disable transition initially to prevent flicker */
     }
 
     /* Footer styles */
@@ -99,18 +181,52 @@
       text-align: center;
       padding: 10px 0;
     }
+
+    .success-dialogue {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #79e988;
+      color: #0b2509;
+      border: 1px solid rgb(13, 107, 29);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+
+    .error-dialogue {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid red;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+    .error-dialogue p {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand navbar-custom">
-    <a class="navbar-brand" href="{% url 'client_home' %}">
+
       <img src="{% static 'images/logo_cpa1.png' %}" alt="Logo" style="height: 40px;">
-    </a>
-    <div class="mx-auto">
-      <h3 class="navbar-text" style="color: #ffffff;">Bank Transactions</h3>
-    </div>    
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      
+      <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+      <div class="navbar-text ml-3">
+    
+      </div>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -118,14 +234,14 @@
         <!-- Add other nav items here if needed -->
       </ul>
       <div class="d-flex align-items-center">
-        <!-- Social media icons -->
+
         <div class="social-icons d-flex">
           <a href="https://web.facebook.com/cpabank?_rdc=1&_rdr" target="_blank" class="fab fa-facebook-f"></a>
           <a href="https://www.youtube.com/@cpa_bank" target="_blank" class="fab fa-youtube"></a>
           <a href="https://www.linkedin.com/company/cpabank/" target="_blank" class="fab fa-linkedin-in"></a>
           <a href="https://www.instagram.com/cpabank/" target="_blank" class="fab fa-instagram"></a>
         </div>
-        <a href="{% url 'logout' %}" class="btn btn-logout ml-3">Logout</a>
+        <a href="{% url 'logout' %}" class="btn btn-logout ml-3"> <i class="fa-solid fa-right-from-bracket"></i> Logout</a>
       </div>
     </div>
   </nav>
@@ -135,21 +251,29 @@
     <!-- Main content with sidebar and content area -->
     <div class="main-content">
       <!-- Sidebar -->
-      <div class="sidebar">
-        <a href="#" class="page-1">Page 1</a>
-
+      <div id="sidebar" class="sidebar">
+        <a href="{% url 'client_home' %}" class="nav-link"> <i class="fa-solid fa-house"></i> Acceuil</a>
+        <a href="#" class="nav-link"> <i class="fa-solid fa-wallet"></i> Mes Comptes</a>
+        <a href="#" class="nav-link"> <i class="fa-solid fa-money-check-dollar"></i> Mes Transatctions</a>
+        <a href="#" class="nav-link"> <i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+        <a href="{% url 'clientinfopersonels' %}" class="nav-link"> <i class="fa-solid fa-user"></i> Mes Informations</a>
+        <a href="{% url 'clientsettings' %}" class="nav-link"> <i class="fa-solid fa-gear"></i> Paramètres</a>
+        <a href="{% url 'proposclient' %}" class="nav-link"> <i class="fa-solid fa-circle-info"></i> À Propos</a>
         <!-- Add more links as needed -->
       </div>
 
       <!-- Main Content -->
-      <div class="content">
-        <!-- Your page content goes here -->
+      <div id="content" class="content">
+        {% block content %}
+        <!-- Default content or placeholder if no content is provided -->
+        {% endblock %}
       </div>
     </div>
+  </div>
 
     <footer class="page-footer font-small indigo fixed-bottom">
       <div class="footer-copyright text-center py-3">&copy; 2024 Copyright:
-          <a href="https://github.com/hibahadj/BankTransactions.git"> Hadj-Akr</a>
+          <a href="https://github.com/hibahadj/BankTransactions.git" target="_blank"> Hadj-Akr</a>
       </div>
   </footer>
 
@@ -158,5 +282,59 @@
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1RrRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+  <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const content = document.querySelector('.content');
+      const toggleBtn = document.querySelector('.toggle-btn');
+      
+      // Check if the sidebarState is already set in localStorage
+      let sidebarState = localStorage.getItem('sidebarState');
+      
+      // If no sidebarState is found in localStorage, set it to 'open' by default
+      if (!sidebarState) {
+        localStorage.setItem('sidebarState', 'open');
+        sidebarState = 'open';
+      }
+      
+      // Apply the sidebar state based on the value in localStorage
+      if (sidebarState === 'open') {
+        sidebar.classList.add('open');
+        content.classList.add('shift');
+        sidebar.classList.remove('hidden');
+      } else {
+        sidebar.classList.remove('open');
+        content.classList.remove('shift');
+        sidebar.classList.add('hidden');
+      }
+      
+      // Reveal sidebar and content after the state is set
+      sidebar.style.visibility = 'visible';
+      content.style.visibility = 'visible';
+      
+      // Re-enable transitions after the initial state
+      setTimeout(() => {
+        sidebar.style.transition = '';
+        content.style.transition = '';
+      }, 0);
+      
+      // Toggle button click event
+      toggleBtn.addEventListener('click', function() {
+        if (sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+          content.classList.remove('shift');
+          sidebar.classList.add('hidden');
+          localStorage.setItem('sidebarState', 'closed');
+        } else {
+          sidebar.classList.add('open');
+          content.classList.add('shift');
+          sidebar.classList.remove('hidden');
+          localStorage.setItem('sidebarState', 'open');
+        }
+      });
+    });
+  </script>  
 </body>
 </html>

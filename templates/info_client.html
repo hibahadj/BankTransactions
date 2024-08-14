@@ -1,0 +1,51 @@
+{% extends "client_home.html" %}
+
+{% block content %}
+<h2> Informations de l'utilisateur :</h2>
+<div class="user-info-container">
+
+    <div class="form-group">
+        <label for="user_id">ID :</label>
+        <input type="text" class="form-control" id="user_id" name="user_id" value="{{ client.clientid }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="clientusername">Nom d'utilisateur (username) :</label>
+        <input type="text" class="form-control" id="username" name="username" value="{{ client.clientusername }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="clientnom">Nom :</label>
+        <input type="text" class="form-control" id="clientnom" name="clientnom" value="{{ client.clientnom }}" readonly>        
+    </div>
+    <div class="form-group">
+        <label for="clientprenom">Prénom :</label>
+        <input type="text" class="form-control" id="clientprenom" name="clientprenom" value="{{ client.clientprenom }}" readonly>        
+    </div>
+    <div class="form-group">
+        <label for="clientdn">Date de naissance :</label>
+        <input type="text" class="form-control" id="clientdn" name="clientdn" value="{{ client.clientdn }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="clientadresse">Adresse :</label>
+        <input type="text" class="form-control" id="clientadresse" name="clientadresse" value="{{ client.clientadresse }}" readonly>     
+    </div>
+    <div class="form-group">
+        <label for="clientemail">Email</label>
+        <input type="email" class="form-control" id="clientemail" name="clientemail" value="{{ client.clientemail }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="clienttelephone">Téléphone :</label>
+        <input type="text" class="form-control" id="clienttelephone" name="clienttelephone" value="{{ client.clienttelephone }}" readonly>        
+    </div>
+    <a href="{% url 'client_home' %}" class="btn-back">Retour à la page d'accueil</a>
+</div>
+
+<style>
+    .user-info-container {
+        position: relative;
+        z-index: 1000; /* Brings this section to the front */
+        background-color: white; /* Optional: Add background to cover content behind */
+        padding: 20px;
+        margin-bottom: 05px; /* Add space for footer */
+    }
+</style>
+{% endblock %}

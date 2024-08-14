@@ -14,7 +14,7 @@ from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import ClientForm
+from .forms import ClientForm, CompteForm
 from django.http import JsonResponse
 
 
@@ -25,9 +25,9 @@ def delete_client(request, client_id):
         try:
             client = get_object_or_404(Client, clientid=client_id)
             client.delete()
-            messages.success(request, "Client deleted successfully.")
+            messages.success(request, "Client supprimer avec succès!")
         except Client.DoesNotExist:
-            messages.error(request, 'Client does not exist.')
+            messages.error(request, "Client n'existe pas!")
         except Exception as e:
             messages.error(request, f'An error occurred while deleting the client: {str(e)}')
     else:
@@ -40,18 +40,16 @@ class ListeClientsView(ListView):
     model = Client
     template_name = 'liste_clients.html'
     context_object_name = 'clients'
-
-
-
-class ListeComptesView(TemplateView):
-    template_name = 'liste_comptes.html'
-
+#comment
 class ListeComptesView(ListView):
     model = Compte
     template_name = 'liste_comptes.html'
     context_object_name = 'comptes'
 class SettingsView(TemplateView):
     template_name = 'settings.html'
+
+class ClientSettingsView(TemplateView):
+    template_name = 'settings_client.html'
 
 class ListeTransactionsView(TemplateView):
     template_name = 'liste_transactions.html'
@@ -69,6 +67,21 @@ class InfoPersonelsView(TemplateView):
                 context['admin'] = None
         else:
             context['admin'] = None
+        return context
+#client template    
+class ClientInfoPersonelsView(TemplateView):
+    template_name = 'info_client.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'user_id' in self.request.session:
+            try:
+                client_user = Client.objects.get(pk=self.request.session['user_id'])
+                context['client'] = client_user
+            except Admin.DoesNotExist:
+                context['client'] = None
+        else:
+            context['client'] = None
         return context
 
 def authenticate_custom_user(username, password):
@@ -219,7 +232,7 @@ def CreateClient(request):
         client.set_password('client123')  # Set default password
         client.save()
         print(f"Client created with ID: {client.pk}")
-        messages.success(request, "Client created successfully.")
+        messages.success(request, "Client créer avec succès!")
         return redirect('clients')  # Redirection to the list of clients
 
     print("Rendering CreateClient form")
@@ -232,36 +245,37 @@ def get_client_data(request, client_id):
         'clientid': client.clientid,
         'clientnom': client.clientnom,
         'clientprenom': client.clientprenom,
-        'clientusername': client.clientusername,
+        #'clientusername': client.clientusername,
         'clientemail': client.clientemail,
         'clienttelephone': client.clienttelephone,
         'clientadresse': client.clientadresse,
-        'clientdn': client.clientdn.strftime('%Y-%m-%d'),  # Format date for HTML input
+        'clientdn': client.clientdn,#.strftime('%Y-%m-%d'),  # Format date for HTML input
     }
     return JsonResponse(client_data)
 
 
 def edit_client(request, client_id):
     client = get_object_or_404(Client, clientid=client_id)
+    
     if request.method == 'POST':
         form = ClientForm(request.POST, instance=client)
+        
         if form.is_valid():
-            form.save()
+            # Update the clientusername before saving
+            client = form.save(commit=False)  # Don't save the form data yet
+            client.clientusername = f"{client.clientprenom}.{client.clientnom}".lower()
+            client.save()  # Now save the updated client object
+            
+            messages.success(request, "Client modifier avec succès!")
             return redirect('clients')  # Redirect to the clients list
+            
     else:
         form = ClientForm(instance=client)
+    
     return render(request, 'edit_client.html', {'form': form, 'client': client})
 
-def edit_compte(request, compteid):
-    compte = get_object_or_404(Compte, compteid=compteid)
-    if request.method == 'POST':
-        form = CompteForm(request.POST, instance=compte)
-        if form.is_valid():
-            form.save()
-            return redirect('comptes')  # Replace with your success URL
-    else:
-        form = CompteForm(instance=compte)
-    return render(request, 'edit_compte.html', {'form': form})
+
+
 @csrf_protect
 def change_password(request):
     if request.method == 'POST':
@@ -273,21 +287,47 @@ def change_password(request):
             admin_user = Admin.objects.get(pk=request.session['user_id'])
 
             if not check_password(current_password, admin_user.adminpassword):
-                messages.error(request, "Current password is incorrect.")
+                messages.error(request, "Mot de passe actuel non valide!")
                 return redirect('settings')
 
             if new_password != confirm_password:
-                messages.error(request, "New password and confirmation do not match.")
+                messages.error(request, "Le nouveau mot de passe et la confirmation ne correspondent pas!")
                 return redirect('settings')
 
             # Update the password
             admin_user.set_password(new_password)
-            messages.success(request, "Password updated successfully.")
+            messages.success(request, "Mot de passe modifier avec succès!")
             return redirect('settings')
     
     return redirect('settings')
 
+@csrf_protect
+def client_change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if 'user_id' in request.session:
+            client_user = Client.objects.get(pk=request.session['user_id'])
 
+            if not check_password(current_password, client_user.clientpassword):
+                messages.error(request, "Mot de passe actuel non valide!")
+                return redirect('clientsettings')
+
+            if new_password != confirm_password:
+                messages.error(request, "Le nouveau mot de passe et la confirmation ne correspondent pas!")
+                return redirect('clientsettings')
+
+            # Update the password
+            client_user.set_password(new_password)
+            messages.success(request, "Mot de passe modifier avec succès!")
+            return redirect('clientsettings')
+    
+    return redirect('clientsettings')
+
+def ProposClientPage(request):
+    return render(request, 'proposclient.html')
 
 def get_compte_data(request, compteid):
     compte = get_object_or_404(Compte, compteid=compteid)
@@ -295,60 +335,38 @@ def get_compte_data(request, compteid):
         'compteid': compte.compteid,
         'client': compte.client.clientid,  # Assuming you want to include client ID, adjust as needed
         'comptesolde': str(compte.comptesolde),  # Convert to string for consistent JSON format
+        'comptenum': compte.comptenum,
         'comptedevise': compte.comptedevise,
     }
     return JsonResponse(compte_data)
-
-def CreateCompte(request):
-    print("Accessing CreateCompte view")
-    
-    # Check if the user is authenticated
-    if not request.session.get('is_authenticated'):
-        print("Unauthorized access to CreateCompte")
-        return redirect('login')
-
-    # Proceed if the user is authenticated
+def create_account(request, client_id):
+    client = get_object_or_404(Client, pk=client_id)
     if request.method == 'POST':
-        compteid = request.POST.get('compteid')
-        clientid = request.POST.get('client')  # Notez que le nom du champ est 'client'
-        comptesolde = request.POST.get('comptesolde')
-        comptedevise = request.POST.get('comptedevise')
-        
-        print(f"Creating compte for client ID: {clientid}")
-        
-        # Retrieve the client object
-        try:
-            client = get_object_or_404(Client, clientid=clientid)
-        except Client.DoesNotExist:
-            messages.error(request, 'Client does not exist.')
-            return redirect('comptes')
-        
-        # Create and save the Compte object
-        compte = Compte(
-            client=client,
-            comptesolde=comptesolde,
-            comptedevise=comptedevise
-        )
-        compte.save()
-        print(f"Compte created with ID: {compte.pk}")
-        messages.success(request, "Compte created successfully.")
-        return redirect('comptes')  # Redirect to the list of comptes
+        form = CompteForm(request.POST)
+        if form.is_valid():
+            compte = form.save(commit=False)
+            compte.client = client
+            compte.save()
+            messages.success(request, 'Compte créer avec succès!')
+            return redirect('clients')
+    else:
+        form = CompteForm()
 
-    print("Rendering CreateCompte form")
-    return render(request, 'create_compte.html')  # Render a form for GET requests
+    return render(request, 'create_account_modal.html', {'form': form, 'client': client})
 
-def delete_compte(request, compteid):
+#
+
+def delete_account(request, compte_id):
     if request.method == 'POST':
         try:
-            # Retrieve the Compte object based on the compte_id
-            compte = get_object_or_404(Compte, compteid=compteid)
+            compte = get_object_or_404(Compte, compteid=compte_id)
             compte.delete()
-            messages.success(request, "Compte deleted successfully.")
-        except Compte.DoesNotExist:
-            messages.error(request, 'Compte does not exist.')
+            messages.success(request, "Compte supprimer avec succès!")
+        except Client.DoesNotExist:
+            messages.error(request, "Compte n'existe pas.")
         except Exception as e:
-            messages.error(request, f'An error occurred while deleting the compte: {str(e)}')
+            messages.error(request, f'An error occurred while deleting the account: {str(e)}')
     else:
         messages.error(request, 'Invalid request method. Please use POST.')
     
-    return redirect('comptes')  # Redirect to the list of comptes
+    return redirect('comptes')  # Redirige vers la page de liste des clients

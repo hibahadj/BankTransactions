@@ -3,15 +3,15 @@
 {% block content %}
 <div class="container">
   <div class="header">
-    <h1>Clients List</h1>
-    <button id="openModal" class="btn btn-create"> <i class="fa-solid fa-plus"></i> Create New Client</button>
+    <h1>Liste Des Clients</h1>
+    <button id="openModal" class="btn btn-create"> <i class="fa-solid fa-plus"></i> Nouveau Client</button>
   </div>
 
     <!-- Search Bar -->
-<div class="search-container">
-  <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
-  <i class="fa fa-search search-icon"></i>
-</div>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
+    <i class="fa fa-search search-icon"></i>
+  </div>
 
   <table class="table" id="clientTable">
     <thead>
@@ -44,12 +44,15 @@
             <a href="#" class="action-icon" title="View Accounts">
               <i class="fa-solid fa-user"></i>
             </a>
+            <a href="#" class="action-icon create-account" data-client-id="{{ client.clientid }}" title="Create Account">
+              <i class="fa-solid fa-wallet"></i>
+          </a>
             <a  href="{%  url 'edit_client' client_id=client.clientid %}" class="action-icon edit-client" data-client-id="{{ client.clientid }}" title="Edit">
               <i class="fa-solid fa-pen"></i>
             </a>
             <form method="POST" action="{% url 'delete_client' client.clientid %}" style="display:inline;" class="delete-client-form" onclick="return confirm('Are you sure you want to delete this client?');">
               {% csrf_token %}
-              <button type="submit" class="action-icon" title="Delete">
+              <button type="submit" class="action-icon" style="background: none; border: none;" title="Delete">
                   <i class="fa-solid fa-trash"></i>
               </button>
           </form>
@@ -58,7 +61,7 @@
       
       {% empty %}
       <tr>
-        <td colspan="8">No clients available.</td>
+        <td colspan="8">Liste vide !!!.</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -68,7 +71,7 @@
   <div id="clientModal" class="modal">
     <div class="modal-content">
       <span id="closeModal" class="close">&times;</span>
-      <h2>Veillez remplir les informations</h2>
+      <h2>Créer un client</h2>
       <form method="POST" action="{% url 'create_client' %}">
         {% csrf_token %}
         <label for="clientnom">Nom :</label>
@@ -102,7 +105,7 @@
   <div id="editClientModal" class="modal">
     <div class="modal-content">
       <span id="closeEditModal" class="close">&times;</span>
-      <h2>Edit Client</h2>
+      <h2>Modifier un client</h2>
       <form id="editClientForm" method="POST" action="">
         {% csrf_token %}
         <input type="hidden" id="editClientId" name="clientid">
@@ -127,19 +130,50 @@
   
   </div>
 
-{% if messages %}
-  {% for message in messages %}
-      {% if message.tags == 'success' %}
-          <div class="success-dialogue">
-              <p>{{ message }}</p>
-          </div>
-      {% elif message.tags == 'error' %}
-          <div class="error-dialogue">
-              <p>{{ message }}</p>
-          </div>
-      {% endif %}
-  {% endfor %}
-{% endif %}
+    <!-- Account Creation Modal -->
+  <div id="createAccountModal" class="modal">
+    <div class="modal-content">
+        <span id="closeCreateAccountModal" class="close">&times;</span>
+        <h2>Créer un compte</h2>
+        <form id="createAccountForm" method="POST" action="">
+            {% csrf_token %}
+            <input type="hidden" id="createAccountClientId" name="clientid">
+            <label for="comptesolde">Solde Initial:</label>
+            <input type="number" class="form-control" id="comptesolde" name="comptesolde" required>
+
+            <label for="comptenum">Numéro de compte</label>
+            <input type="text" class="form-control" id="comptenum" name="comptenum" required>
+
+            <label for="comptedevise">Devise:</label>
+            <select id="compteDevise" name="comptedevise" class="form-control" required>
+                <option value="Dinar">Dinar</option>
+                <option value="Euro">Euro</option>
+                <option value="Dollar">Dollar</option>
+                <option value="Dirhem">Dirhem</option>
+            </select>
+
+            <div class="form-buttons">
+                <button type="button" id="cancelCreateAccount" class="btn btn-cancel">Annuler</button>
+                <button type="submit" class="btn btn-create">Créer</button>
+            </div>
+        </form>
+    </div>
+  </div>
+
+
+  {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-dialogue">
+                <p>{{ message }}</p>
+            </div>
+        {% elif message.tags == 'error' %}
+            <div class="error-dialogue">
+                <p>{{ message }}</p>
+            </div>
+        {% endif %}
+    {% endfor %}
+  {% endif %}
 
   <style>
     /* Styles pour la modale */
@@ -215,7 +249,7 @@
       margin-top: 20px;
     }
 
-    
+
 
     /* Styles pour les icônes d'action */
     .action-icon {
@@ -322,116 +356,151 @@
     });
     
   </script>
-  <script>
-    // JavaScript pour ouvrir et fermer la modale
-    document.addEventListener('DOMContentLoaded', function() {
-      var modal = document.getElementById("clientModal");
-      var btn = document.getElementById("openModal");
-      var span = document.getElementById("closeModal");
-      
-      btn.onclick = function() {
-        modal.style.display = "block";
-      }
+    <script>
+      // JavaScript pour ouvrir et fermer la modale
+      document.addEventListener('DOMContentLoaded', function() {
+        var modal = document.getElementById("clientModal");
+        var btn = document.getElementById("openModal");
+        var span = document.getElementById("closeModal");
+        
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
 
-      span.onclick = function() {
-        modal.style.display = "none";
-      }
-
-      window.onclick = function(event) {
-        if (event.target == modal) {
+        span.onclick = function() {
           modal.style.display = "none";
         }
-      }
-    });
-    function delete_client(event) {
-    event.preventDefault(); // Empêche le comportement par défaut du lien
-    var clientId = event.currentTarget.getAttribute('data-client-id');
-    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    if (confirm('Are you sure you want to delete this client?')) {
-      fetch(`/delete_client/${clientId}/`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken
-        }
-      })
-      .then(response => {
-    if (response.ok) {
-        // Supprimer la ligne du tableau
-        event.currentTarget.closest('tr').remove();
-        //alert('Client deleted successfully.');
-    } else {
-        // Afficher les détails de l'erreur
-        response.text().then(errorText => {
-            alert(`An error occurred while deleting the client: ${errorText}`);
-        });
-    }
-})
 
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the client.');
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
       });
+      function delete_client(event) {
+      event.preventDefault(); // Empêche le comportement par défaut du lien
+      var clientId = event.currentTarget.getAttribute('data-client-id');
+      var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      
+      if (confirm('Are you sure you want to delete this client?')) {
+        fetch(`/delete_client/${clientId}/`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          }
+        })
+        .then(response => {
+      if (response.ok) {
+          // Supprimer la ligne du tableau
+          event.currentTarget.closest('tr').remove();
+          //alert('Client deleted successfully.');
+      } else {
+          // Afficher les détails de l'erreur
+          response.text().then(errorText => {
+              alert(`An error occurred while deleting the client: ${errorText}`);
+          });
+     }
+    })
+
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while deleting the client.');
+        });
+      }
     }
-  }
-  
-  </script>
-  <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
-  <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+    
+    </script>
+    <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+    <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
 
 
 
 
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var searchInput = document.getElementById('searchInput');
-  var searchIcon = document.querySelector('.search-icon');
-  var table = document.getElementById('clientTable');
-  var tr = table.getElementsByTagName('tr');
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('searchInput');
+    var searchIcon = document.querySelector('.search-icon');
+    var table = document.getElementById('clientTable');
+    var tr = table.getElementsByTagName('tr');
 
-  // Function to toggle the visibility of the search icon
-  function toggleIconVisibility() {
-    if (searchInput.value.trim() === '') {
-      searchIcon.classList.remove('hidden');
-    } else {
-      searchIcon.classList.add('hidden');
-    }
-  }
-
-  // Event listener for filtering the client list
-  searchInput.addEventListener('keyup', function() {
-    var filter = searchInput.value.toLowerCase();
-
-    for (var i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
-      var tdId = tr[i].getElementsByTagName('td')[0];
-      var tdNom = tr[i].getElementsByTagName('td')[1];
-      var tdPrenom = tr[i].getElementsByTagName('td')[2];
-      if (tdId || tdNom || tdPrenom) {
-        var idValue = tdId.textContent || tdId.innerText;
-        var nomValue = tdNom.textContent || tdNom.innerText;
-        var prenomValue = tdPrenom.textContent || tdPrenom.innerText;
-        if (idValue.toLowerCase().indexOf(filter) > -1 || 
-            nomValue.toLowerCase().indexOf(filter) > -1 || 
-            prenomValue.toLowerCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
+    // Function to toggle the visibility of the search icon
+    function toggleIconVisibility() {
+      if (searchInput.value.trim() === '') {
+        searchIcon.classList.remove('hidden');
+      } else {
+        searchIcon.classList.add('hidden');
       }
     }
 
-    // Toggle icon visibility based on input value
+    // Event listener for filtering the client list
+    searchInput.addEventListener('keyup', function() {
+      var filter = searchInput.value.toLowerCase();
+
+      for (var i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+        var tdId = tr[i].getElementsByTagName('td')[0];
+        var tdNom = tr[i].getElementsByTagName('td')[1];
+        var tdPrenom = tr[i].getElementsByTagName('td')[2];
+        if (tdId || tdNom || tdPrenom) {
+          var idValue = tdId.textContent || tdId.innerText;
+          var nomValue = tdNom.textContent || tdNom.innerText;
+          var prenomValue = tdPrenom.textContent || tdPrenom.innerText;
+          if (idValue.toLowerCase().indexOf(filter) > -1 || 
+              nomValue.toLowerCase().indexOf(filter) > -1 || 
+              prenomValue.toLowerCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+
+      // Toggle icon visibility based on input value
+      toggleIconVisibility();
+    });
+
+    // Initial check to ensure the icon is visible if the input is empty
     toggleIconVisibility();
   });
 
-  // Initial check to ensure the icon is visible if the input is empty
-  toggleIconVisibility();
-});
-
-</script> 
-
+  </script> 
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      var accountModal = document.getElementById("createAccountModal");
+      var closeAccountBtn = document.getElementById("closeCreateAccountModal");
+      var cancelAccountBtn = document.getElementById("cancelCreateAccount");
+      var accountLinks = document.querySelectorAll('.create-account');
+      
+      function openAccountModal(clientId) {
+          document.getElementById('createAccountClientId').value = clientId;
+          document.getElementById('createAccountForm').action = `/create_account/${clientId}/`; // Adjust the action URL as needed
+          accountModal.style.display = 'block';
+      }
+      
+      accountLinks.forEach(link => {
+          link.addEventListener('click', function(event) {
+              event.preventDefault();
+              var clientId = this.getAttribute('data-client-id');
+              openAccountModal(clientId);
+          });
+      });
+      
+      closeAccountBtn.onclick = function() {
+          accountModal.style.display = 'none';
+      }
+      
+      cancelAccountBtn.onclick = function() {
+          accountModal.style.display = 'none';
+      }
+      
+      window.onclick = function(event) {
+          if (event.target == accountModal) {
+              accountModal.style.display = 'none';
+          }
+      }
+  });
+  </script>
 </div>
 {% endblock %}

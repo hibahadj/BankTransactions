@@ -3,73 +3,60 @@
 {% block content %}
 <div class="container">
   <div class="header">
-    <h1>accounts List</h1>
+    <h1>Liste Des Comptes</h1>
 
-    <button id="openModal" class="btn btn-create">
-      <i class="fa-solid fa-plus"></i> Create New account
-    </button>
+  
   </div>
 
-  <!-- Search Bar -->
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Search by ID" class="form-control search-bar">
-    <i class="fa fa-search search-icon"></i>
-  </div>
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Recherche par ID, Numéro Compte, Client" class="form-control search-bar">
+      <i class="fa fa-search search-icon"></i>
+    </div>
 
+  <!-- Table displaying accounts -->
   <table class="table" id="compteTable">
     <thead>
       <tr>
-        <th>IDcompte</th>
-        <th>Client Username</th>
+        <th>ID compte</th>
+        <th>ID client</th>
+        <th>Client</th>
+        <th>Numéro de compte</th>
         <th>Solde</th>
         <th>Devise</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for compte in comptes %}
       <tr>
         <td>{{ compte.compteid }}</td>
-        <td>{{ compte.client }}</td>
+        <td>{{ compte.client.clientid }}</td>
+        <td>{{ compte.client.clientusername }}</td>
+        <td>{{ compte.comptenum }}</td>
         <td>{{ compte.comptesolde }}</td>
         <td>{{ compte.comptedevise }}</td>
+        <td>
+          <a href="#" class="action-icon" title="View Accounts">
+            <i class="fa-solid fa-money-check-dollar"></i>
+          </a>
+          <form method="POST" action="{% url 'delete_account' compte.compteid %}" style="display:inline;" class="delete-account-form" onclick="return confirm('Are you sure you want to delete this account?');">
+            {% csrf_token %}
+            <button type="submit" class="action-icon" style="background: none; border: none;" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </form>
+        </td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="5">No accounts available.</td>
+        <td colspan="5">Liste vide !!!.</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 
-  <!-- Modal for Creating New Account -->
-  <div id="CompteModal" class="modal">
-    <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h2>Veillez remplir les informations</h2>
-      <form method="POST" action="{% url 'Create_Compte' %}">
-        {% csrf_token %}
-        <label for="compteid">Compte ID :</label>
-        <input type="text" class="form-control" id="compteid" name="compteid" readonly>
-
-        <label for="client">Client :</label>
-        <input type="text" class="form-control" id="client" name="client" required>
-        
-
-        <label for="comptesolde">Solde :</label>
-        <input type="number" step="0.01" class="form-control" id="comptesolde" name="comptesolde" required>
-
-        <label for="comptedevise">Devise :</label>
-        <input type="text" class="form-control" id="comptedevise" name="comptedevise" required>
-
-        <div class="form-buttons">
-          <a href="{% url 'comptes' %}" class="btn btn-cancel">Annuler</a>
-          <button type="submit" class="btn btn-create">Submit</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-
+  <!-- Success message display -->
   {% if messages %}
   <div class="success-dialogue">
     {% for message in messages %}
@@ -77,12 +64,14 @@
     {% endfor %}
   </div>
   {% endif %}
+ </div>
+
 
   <style>
     .modal {
       display: none; /* Caché par défaut */
       position: fixed;
-      z-index: 1;
+      z-index: 3;
       left: 0;
       top: 0;
       width: 100%;
@@ -208,50 +197,91 @@
   </style>
 
   <script>
+          function delete_account(event) {
+      event.preventDefault(); // Empêche le comportement par défaut du lien
+      var compteId = event.currentTarget.getAttribute('data-compte-id');
+      var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      
+      if (confirm('Are you sure you want to delete this account?')) {
+        fetch(`/delete_account/${compteId}/`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          }
+        })
+        .then(response => {
+      if (response.ok) {
+          // Supprimer la ligne du tableau
+          event.currentTarget.closest('tr').remove();
+          //alert('Client deleted successfully.');
+      } else {
+          // Afficher les détails de l'erreur
+          response.text().then(errorText => {
+              alert(`An error occurred while deleting the account: ${errorText}`);
+          });
+     }
+    })
+
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while deleting the client.');
+        });
+      }
+    }
+  </script>
+  <script> setTimeout(function() {document.querySelector('.error-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+  <script> setTimeout(function() {document.querySelector('.success-dialogue').style.display = 'none';}, 5000); // 5000 milliseconds = 5 seconds </script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Modal for Creating New Account
-      var createModal = document.getElementById("CompteModal");
-      var openModalBtn = document.getElementById("openModal");
-      var closeCreateModal = document.getElementById("closeModal");
+      var searchInput = document.getElementById('searchInput');
+      var searchIcon = document.querySelector('.search-icon');
+      var table = document.getElementById('compteTable');
+      var tr = table.getElementsByTagName('tr');
 
-      openModalBtn.onclick = function() {
-        createModal.style.display = "block";
-      }
-
-      closeCreateModal.onclick = function() {
-        createModal.style.display = "none";
-      }
-
-      window.onclick = function(event) {
-        if (event.target == createModal) {
-          createModal.style.display = "none";
+      // Function to toggle the visibility of the search icon
+      function toggleIconVisibility() {
+        if (searchInput.value.trim() === '') {
+          searchIcon.classList.remove('hidden');
+        } else {
+          searchIcon.classList.add('hidden');
         }
       }
 
+      // Event listener for filtering the client list
+      searchInput.addEventListener('keyup', function() {
+        var filter = searchInput.value.toLowerCase();
 
-      // Search functionality
-      var searchInput = document.getElementById('searchInput');
-      var table = document.getElementById('compteTable');
-      var rows = table.getElementsByTagName('tr');
-
-      searchInput.addEventListener('input', function() {
-        var filter = searchInput.value.toUpperCase();
-
-        for (var i = 1; i < rows.length; i++) {
-          var cells = rows[i].getElementsByTagName('td');
-          var found = false;
-
-          for (var j = 0; j < cells.length; j++) {
-            if (cells[j].textContent.toUpperCase().indexOf(filter) > -1) {
-              found = true;
-              break;
+        for (var i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+          var tdIDcompte = tr[i].getElementsByTagName('td')[0];
+          var tdIDclient = tr[i].getElementsByTagName('td')[1];
+          var tdUsername = tr[i].getElementsByTagName('td')[2];
+          var tdNum = tr[i].getElementsByTagName('td')[3];
+          
+          if (tdIDcompte && tdIDclient && tdUsername && tdNum) { // Ensure elements exist
+            var idcompteValue = tdIDcompte.textContent || tdIDcompte.innerText;
+            var idclientValue = tdIDclient.textContent || tdIDclient.innerText;
+            var usernameValue = tdUsername.textContent || tdUsername.innerText;
+            var numValue = tdNum.textContent || tdNum.innerText;
+            
+            if (idcompteValue.toLowerCase().indexOf(filter) > -1 || 
+                idclientValue.toLowerCase().indexOf(filter) > -1 || 
+                usernameValue.toLowerCase().indexOf(filter) > -1 || 
+                numValue.toLowerCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
             }
           }
-
-          rows[i].style.display = found ? '' : 'none';
         }
+
+        // Toggle icon visibility based on input value
+        toggleIconVisibility();
       });
+
+      // Initial check to ensure the icon is visible if the input is empty
+      toggleIconVisibility();
     });
-  </script>
+    </script> 
 </div>
 {% endblock %}

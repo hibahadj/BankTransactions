@@ -19,7 +19,7 @@ from django.views.generic.base import RedirectView
 from django.urls import path
 from app1 import views
 from django.conf import settings
-from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password
+from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password, client_change_password, ClientInfoPersonelsView, ClientSettingsView, ProposClientPage, delete_account
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/login/', permanent=False), name='home_redirect'),  # Redirect to LOGIN_URL
@@ -31,15 +31,18 @@ urlpatterns = [
     path('comptes/', ListeComptesView.as_view(), name='comptes'),
     path('transactions/', ListeTransactionsView.as_view(), name='transactions'),
     path('infopersonels/', InfoPersonelsView.as_view(), name='Infopersonels'),
+    path('clientinfopersonels/', ClientInfoPersonelsView.as_view(), name='clientinfopersonels'),
     path('settings/', SettingsView.as_view(), name='settings'),
+    path('clientsettings/', ClientSettingsView.as_view(), name='clientsettings'),
     path('change-password/', change_password, name='change_password'),
+    path('client-change-password/', client_change_password, name='client_change_password'),
     path('create_client/', views.CreateClient, name='create_client'),
     path('delete_client/<int:client_id>/', delete_client, name='delete_client'),
+    path('delete_account/<int:compte_id>/', delete_account, name='delete_account'),
     path('edit_client/<int:client_id>/',views.edit_client, name='edit_client'),
     path('get_client_data/<int:client_id>/', views.get_client_data, name='get_client_data'),
-    path('Create_Compte/', views.CreateCompte, name='Create_Compte'),
-    path('delete_compte/<int:clientid>/', views.delete_compte, name='delete_compte'),
-    path('edit_compte/<int:clientid>/',views.edit_compte, name='edit_compte'),
+    path('create_account/<int:client_id>/', views.create_account, name='create_account'),
+    path('propos/', ProposClientPage, name='proposclient'),  
     path('get_compte_data/<int:clientid>/', views.get_compte_data, name='get_compte_data'),
 ]
 if settings.DEBUG:

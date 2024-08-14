@@ -1,0 +1,65 @@
+{% extends "client_home.html" %}
+
+{% block content %}
+<div class="propos-section">
+    <h1>À propos de l'application</h1>
+
+    <!-- Introduction Section -->
+    <section class="introduction">
+        <h2>Introduction</h2>
+        <p>Bienvenue dans notre application! Cette plateforme est conçue pour vous offrir une expérience utilisateur fluide et intuitive, vous permettant de gérer vos transations avec facilité.</p>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Fonctionnalités Principales</h2>
+        <ul>
+            <li>Gestion des clients</li>
+            <li>Interface utilisateur</li>
+            <li>Authentification sécurisée et gestion des sessions</li>
+            <li>Accès aux données en temps réel</li>
+        </ul>
+    </section>
+
+    <!-- Credits Section -->
+    <section class="credits">
+        <h2>Crédits</h2>
+        <div>&copy; 2024 Copyright:
+            <a href="https://github.com/hibahadj/BankTransactions.git" target="_blank"> Hadj-Akr</a>. Tous droits réservés.
+        </div>
+    </section>
+
+    <!-- Technology Stack Section -->
+    <section class="technology">
+        <h2>Technologies Utilisées</h2>
+        <p>Notre application est construite avec des technologies pour garantir performance et sécurité.</p>
+        <ul>
+            <li>Backend: Django (Python)</li>
+            <li>Frontend: HTML5, CSS3, JavaScript, bootstrap</li>
+            <li>Base de données: sqllite3</li>
+        </ul>
+    </section>
+
+    <!-- Contact Information Section -->
+    <section class="contact">
+        <h2>Contactez-nous</h2>
+        <p>Pour toute question, suggestion ou support, n'hésitez pas à nous contacter.</p>
+        <ul>
+            <li>Email: <a href="mailto:hadjiedjhiba92@gmail.com">hadjiedjhiba92@gmail.com</a> ou <a href="mailto:akrabkamilia@gmail.com">akrabkamilia@gmail.com</a></li>
+            <li>Adresse: Alger, Algérie</li>
+        </ul>
+    </section>
+</div>
+
+<style>
+    .propos-section h1,
+    .propos-section h2 {
+        margin-bottom: 20px; /* Adjust the value as needed */
+    }
+    .propos-section h2 {
+        margin-top: 20px; /* Adjust the value as needed */
+    }
+
+</style>
+
+{% endblock %}

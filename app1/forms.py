@@ -15,6 +15,6 @@ class AdminForm(forms.ModelForm):
 class CompteForm(forms.ModelForm):
     class Meta:
         model = Compte
-        fields = ['client', 'comptesolde', 'comptedevise']
+        fields = ['comptesolde', 'comptenum', 'comptedevise']
         # You can include other fields as needed
         # Exclude fields that should not be editable in the form

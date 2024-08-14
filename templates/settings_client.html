@@ -1,4 +1,4 @@
-{% extends "admin_home.html" %}
+{% extends "client_home.html" %}
 
 {% block content %}
 <div class="container mt-5">
@@ -28,7 +28,7 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h3 class="modal-title">Changer Le Mot De Passe</h3>
-        <form method="post" action="{% url 'change_password' %}">
+        <form method="post" action="{% url 'client_change_password' %}">
             {% csrf_token %}
             <div class="form-group">
                 <label for="current_password">Ancient Mot De Passe</label>

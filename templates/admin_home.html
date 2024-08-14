@@ -180,6 +180,7 @@
       color: #ffffff;
       text-align: center;
       padding: 10px 0;
+      z-index: 1;
     }
 
     .success-dialogue {
@@ -254,7 +255,7 @@
       <div id="sidebar" class="sidebar">
         <a href="{% url 'admin_home' %}" class="nav-link"> <i class="fa-solid fa-house"></i> Acceuil</a>
         <a href="{% url 'clients' %}" class="nav-link"> <i class="fa fa-users"></i> Liste de Clients</a>
-        <a href="{% url 'comptes' %}" class="nav-link"> <i class="fa-solid fa-building-columns"></i> Liste des Comptes</a>
+        <a href="{% url 'comptes' %}" class="nav-link"> <i class="fa-solid fa-wallet"></i> Liste des Comptes</a>
         <a href="{% url 'transactions' %}" class="nav-link"> <i class="fa-solid fa-money-check-dollar"></i> Liste des Transatctions</a>
         <a href="{% url 'Infopersonels' %}" class="nav-link"> <i class="fa-solid fa-user"></i> Informations</a>
         <a href="{% url 'settings' %}" class="nav-link"> <i class="fa-solid fa-gear"></i> Paramètre</a>
@@ -272,7 +273,7 @@
 
     <footer class="page-footer font-small indigo fixed-bottom">
       <div class="footer-copyright text-center py-3">&copy; 2024 Copyright:
-          <a href="https://github.com/hibahadj/BankTransactions.git"> Hadj-Akr</a>
+          <a href="https://github.com/hibahadj/BankTransactions.git" target="_blank"> Hadj-Akr</a>
       </div>
   </footer>
 

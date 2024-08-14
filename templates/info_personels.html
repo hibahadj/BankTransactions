@@ -1,18 +1,18 @@
 {% extends "admin_home.html" %}
 
 {% block content %}
-    <h2>Informations de l'Administrateur</h2>
+    <h2>Informations de l'Administrateur :</h2>
 
     <div class="form-group">
-        <label for="user_id">ID</label>
+        <label for="user_id">ID :</label>
         <input type="text" class="form-control" id="user_id" name="user_id" value="{{ admin.adminid }}" readonly>
     </div>
     <div class="form-group">
-        <label for="username">Nom d'utilisateur</label>
+        <label for="username">Nom d'utilisateur :</label>
         <input type="text" class="form-control" id="username" name="username" value="{{ admin.adminusername }}" readonly>
     </div>
     <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">Email :</label>
         <input type="email" class="form-control" id="email" name="email" value="{{ admin.adminemail }}" readonly>
     </div>
     <a href="{% url 'admin_home' %}" class="btn-back">Retour à la page d'accueil</a>
