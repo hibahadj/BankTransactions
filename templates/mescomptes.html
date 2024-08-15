@@ -1,0 +1,38 @@
+{% extends 'client_home.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h1>Mes Comptes</h1>
+    
+    <!-- Tableau des comptes -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+            <th>ID compte</th>
+            <th>ID client</th>
+            <th>Client</th>
+            <th>Numéro de compte</th>
+            <th>Solde</th>
+            <th>Devise</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          {% for compte in comptes %}
+          <tr>
+            <td>{{ compte.compteid }}</td>
+            <td>{{ compte.client.clientid }}</td>
+            <td>{{ compte.client.clientusername }}</td>
+            <td>{{ compte.comptenum }}</td>
+            <td>{{ compte.comptesolde }}</td>
+            <td>{{ compte.comptedevise }}</td> <!-- Remplacez avec le champ de date de création si disponible -->
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">Aucun compte trouvé.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

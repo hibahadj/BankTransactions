@@ -1,0 +1,157 @@
+{% extends 'client_home.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <div class="container mt-4">
+    <h1>Tableau de Bord</h1>
+    <div class="row">
+      <!-- Boucle pour afficher les comptes -->
+      {% for compte in comptes %}
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <div class="card-body d-flex align-items-center">
+              <!-- Icône représentant le compte -->
+              <i class="fas fa-wallet fa-3x mr-3 text-success"></i>
+              <div>
+                <h5 class="card-title">Compte: {{ compte.comptenum }}</h5>
+                <p class="card-text">Solde: {{ compte.comptesolde }} {{ compte.comptedevise }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Conteneur pour le graphique -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Graphique des Soldes des Comptes</h5>
+            <canvas id="myChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Styles pour les cartes */
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .card-body {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+    color: #11216f; /* Couleur de texte principale */
+  }
+
+  .card-text {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .text-success {
+    color: #28a745;
+  }
+
+  .fa-wallet, .fa-users {
+    margin-right: 20px;
+  }
+
+  /* Ajouter une transition pour un effet au survol */
+  .card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Styles pour le graphique */
+  #myChart {
+    height: 300px; /* Hauteur du graphique */
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var compteNumbers = JSON.parse(document.getElementById('compteNumbers').textContent);
+    var compteSoldes = JSON.parse(document.getElementById('compteSoldes').textContent);
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+      type: 'bar', // Type de graphique (barres, lignes, etc.)
+      data: {
+        labels: compteNumbers, // Labels des données (numéros de compte)
+        datasets: [{
+          label: 'Solde des Comptes',
+          data: compteSoldes, // Données du graphique (soldes)
+          backgroundColor: 'rgba(54, 162, 235, 0.2)', // Couleur de fond des barres
+          borderColor: 'rgba(54, 162, 235, 1)', // Couleur de la bordure des barres
+          borderWidth: 1 // Largeur de la bordure
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: {
+              font: {
+                size: 14 // Taille de la police des labels de l'axe X
+              }
+            },
+            grid: {
+              display: false // Masquer la grille de l'axe X
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              font: {
+                size: 14 // Taille de la police des labels de l'axe Y
+              },
+              stepSize: 500 // Pas des graduations sur l'axe Y
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)' // Couleur de la grille de l'axe Y
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top', // Position de la légende
+            labels: {
+              font: {
+                size: 14 // Taille de la police des labels de la légende
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                return tooltipItem.dataset.label + ': $' + tooltipItem.raw.toLocaleString(); // Formatage des tooltips
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

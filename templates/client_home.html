@@ -249,11 +249,12 @@
   <!-- Flexbox container -->
   <div class="container-flex">
     <!-- Main content with sidebar and content area -->
+  
     <div class="main-content">
       <!-- Sidebar -->
       <div id="sidebar" class="sidebar">
-        <a href="{% url 'client_home' %}" class="nav-link"> <i class="fa-solid fa-house"></i> Acceuil</a>
-        <a href="#" class="nav-link"> <i class="fa-solid fa-wallet"></i> Mes Comptes</a>
+        <a href="{% url 'client_dashboard'  %}" class="nav-link"> <i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="{% url 'mescomptes'  %}" class="nav-link"> <i class="fa-solid fa-wallet"></i> Mes Comptes</a>
         <a href="#" class="nav-link"> <i class="fa-solid fa-money-check-dollar"></i> Mes Transatctions</a>
         <a href="#" class="nav-link"> <i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
         <a href="{% url 'clientinfopersonels' %}" class="nav-link"> <i class="fa-solid fa-user"></i> Mes Informations</a>
