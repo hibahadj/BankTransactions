@@ -19,7 +19,7 @@ from django.views.generic.base import RedirectView
 from django.urls import path
 from app1 import views
 from django.conf import settings
-from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password, client_change_password, ClientInfoPersonelsView, ClientSettingsView, ProposClientPage, delete_account
+from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password, client_change_password, ClientInfoPersonelsView, ClientSettingsView, ProposClientPage, delete_account, dashboard_view, create_transaction, download_transactions
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/login/', permanent=False), name='home_redirect'),  # Redirect to LOGIN_URL
@@ -46,6 +46,9 @@ urlpatterns = [
     path('propos/', ProposClientPage, name='proposclient'),  
     path('get_compte_data/<int:compteid>/', views.get_compte_data, name='get_compte_data'),
     path('download_transactions/<str:compte_num>/', download_transactions, name='download_transactions'),
+    path('dashboard', dashboard_view, name='dashboard'),
+    path('client_dashboard/', views.dashboard_client, name='client_dashboard'),
+    path('mescomptes/', views.mescomptes, name='mescomptes'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
