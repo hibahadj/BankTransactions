@@ -19,8 +19,7 @@ from django.views.generic.base import RedirectView
 from django.urls import path
 from app1 import views
 from django.conf import settings
-from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password, client_change_password, ClientInfoPersonelsView, ClientSettingsView, ProposClientPage, delete_account, create_transaction, download_transactions
-
+from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password, client_change_password, ClientInfoPersonelsView, ClientSettingsView, ProposClientPage, delete_account
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/login/', permanent=False), name='home_redirect'),  # Redirect to LOGIN_URL

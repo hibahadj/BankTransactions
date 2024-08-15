@@ -6,9 +6,9 @@ from django.utils import timezone
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import csrf_protect
-from app1.models import Client, Admin, Compte, Transaction
+from app1.models import Client, Admin, Compte,Transaction
 from django.contrib.auth.hashers import check_password, make_password
-
+import json
 from django.shortcuts import get_object_or_404, redirect
 
 from django.urls import reverse_lazy
@@ -433,3 +433,68 @@ class ListeTransactionsView(ListView):
     model = Transaction
     template_name = 'liste_transactions.html'
     context_object_name = 'transactions'
+
+
+def dashboard_view(request):
+
+    # Récupérer les statistiques
+    nombre_clients = Client.objects.count()
+    nombre_comptes = Compte.objects.count()
+
+    context = {
+        'nombre_clients': nombre_clients,
+        'nombre_comptes': nombre_comptes,
+    }
+    return render(request, 'dashboard.html', context)
+
+
+def dashboard_client(request):
+    # Récupérez l'ID du client à partir de la session
+    client_id = request.session.get('user_id')  # Assurez-vous que 'user_id' est bien stocké dans la session
+
+    if client_id:
+        try:
+            # Récupérez le client depuis la base de données
+            client = Client.objects.get(pk=client_id)
+            # Récupérez les comptes du client
+            comptes = Compte.objects.filter(client=client)
+
+            # Créez des données pour le graphique
+            labels = [compte.comptenum for compte in comptes]
+            data = [compte.comptesolde for compte in comptes]
+
+            return render(request, 'client_dashboard.html', {
+                'client': client,
+                'comptes': comptes,
+                'labels': labels,
+                'data': data
+            })
+        except Client.DoesNotExist:
+            return redirect('login')
+    else:
+        return redirect('client_dashboard')
+
+
+
+
+
+def mescomptes(request):
+    # Récupérer l'ID du client depuis la session (ou le modèle User si c'est là que vous stockez l'ID)
+    user_id = request.session.get('user_id')  # Assurez-vous que l'ID du client est stocké dans la session
+    
+    if not user_id:
+        return redirect('login')  # Rediriger si l'utilisateur n'est pas authentifié
+    
+    try:
+        # Récupérer le client à partir de l'ID
+        client = Client.objects.get(pk=user_id)
+        
+        # Récupérer tous les comptes associés à ce client
+        comptes = Compte.objects.filter(client=client)
+        
+        # Rendre le template avec les comptes
+        return render(request, 'mescomptes.html', {'comptes': comptes})
+    
+    except Client.DoesNotExist:
+        # Gérer le cas où le client n'existe pas
+        return redirect('login')
