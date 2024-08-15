@@ -9,7 +9,7 @@
 
     <!-- Search Bar -->
   <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Search by ID, Nom, or Prénom" class="form-control search-bar">
+    <input type="text" id="searchInput" placeholder="Recherche par ID, Nom ou Prénom" class="form-control search-bar">
     <i class="fa fa-search search-icon"></i>
   </div>
 
@@ -46,7 +46,7 @@
             </a>
             <a href="#" class="action-icon create-account" data-client-id="{{ client.clientid }}" title="Create Account">
               <i class="fa-solid fa-wallet"></i>
-          </a>
+           </a>
             <a  href="{%  url 'edit_client' client_id=client.clientid %}" class="action-icon edit-client" data-client-id="{{ client.clientid }}" title="Edit">
               <i class="fa-solid fa-pen"></i>
             </a>

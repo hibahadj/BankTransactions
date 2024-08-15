@@ -1,9 +1,231 @@
-{% extends "admin_home.html" %}
-
-{% block title %}Liste Transactions{% endblock %}
+{% extends 'admin_home.html' %}
 
 {% block content %}
-<h1>Liste Transactions</h1>
-<p>Content for Liste Transactions goes here.</p>
-<!-- Add your transactions list content here -->
+<div class="container">
+  <div class="header">
+    <h1>Liste des Transactions</h1>
+    <button id="exportButton" class="btn btn-success" style="margin-top: 25px;"> <i class="fa fa-download"></i> Télécharger Excel </button>
+  </div>
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Recherche par ID, Numéro Compte, Username Date" class="form-control search-bar">
+      <i class="fa fa-search search-icon"></i>
+    </div>
+
+  <!-- Table displaying transactions -->
+  <table class="table" id="transactionTable">
+    <thead>
+      <tr>
+        <th>ID Transaction</th>
+        <th>ID Client</th>
+        <th>Client</th>
+        <th>Numéro Compte</th>
+        <th>Type Transaction</th>
+        <th>Montant</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for transaction in transactions %}
+        <tr>
+            <td>{{ transaction.transactionid }}</td>
+            <td>{{ transaction.compte.client.clientid }}</td> <!-- Client ID -->
+            <td>{{ transaction.compte.client.clientusername }}</td> <!-- Client Username -->
+            <td>{{ transaction.compte.comptenum }}</td> <!-- Client Username -->
+            <td>{{ transaction.transactiontype }}</td>
+            <td>{{ transaction.transactionmontant }}</td>
+            <td>{{ transaction.transactiondate }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">Liste vide!!!</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+    <!-- Success message display -->
+    {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="success-dialogue">
+                <p>{{ message }}</p>
+            </div>
+        {% elif message.tags == 'error' %}
+            <div class="error-dialogue">
+                <p>{{ message }}</p>
+            </div>
+        {% endif %}
+     {% endfor %}
+    {% endif %}
+  
+  
+    <style>
+      .modal {
+        display: none; /* Caché par défaut */
+        position: fixed;
+        z-index: 3;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+  
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+      }
+  
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+  
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+  
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+  
+      .header h1 {
+        margin: 0;
+      }
+  
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+  
+      label {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+  
+      input {
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+  
+      .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+  
+      .success-dialogue {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #79e988;
+        color: #0b2509;
+        border: 1px solid rgb(13, 107, 29);
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+      }
+  
+      .action-icon {
+        text-decoration: none;
+        color: #333;
+        margin: 0 5px;
+        font-size: 1.2em;
+        display: inline-block;
+      }
+  
+      .action-icon:hover {
+        color: #007bff;
+      }
+  
+      .search-container {
+        display: flex;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+      }
+  
+      .search-bar {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #11216f;
+        border-radius: 4px;
+        width: 100%;
+      }
+  
+      .search-icon {
+        position: absolute;
+        right: 10px;
+        top: 57%;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: #666;
+      }
+  
+      .search-icon.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const transactionTable = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
+
+            searchInput.addEventListener('keyup', function() {
+                const filter = searchInput.value.toLowerCase();
+                const rows = transactionTable.getElementsByTagName('tr');
+
+                Array.from(rows).forEach(function(row) {
+                    // Columns: Transaction ID (index 0), Client ID (index 1), Client Username (index 2), Numéro du compte (index 3), Date (index 6)
+                    const transactionId = row.getElementsByTagName('td')[0].textContent.toLowerCase();
+                    const clientId = row.getElementsByTagName('td')[1].textContent.toLowerCase();
+                    const clientUsername = row.getElementsByTagName('td')[2].textContent.toLowerCase();
+                    const accountNumber = row.getElementsByTagName('td')[3].textContent.toLowerCase();
+                    const date = row.getElementsByTagName('td')[6].textContent.toLowerCase();
+
+                    if (
+                        transactionId.indexOf(filter) > -1 || 
+                        clientId.indexOf(filter) > -1 || 
+                        clientUsername.indexOf(filter) > -1 || 
+                        accountNumber.indexOf(filter) > -1 || 
+                        date.indexOf(filter) > -1
+                    ) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Export table to Excel functionality
+        exportButton.addEventListener('click', function() {
+            let table = document.getElementById("transactionTable");
+            let workbook = XLSX.utils.table_to_book(table, {sheet: "Transactions"});
+            XLSX.writeFile(workbook, 'transactions.xlsx');
+        });
+    </script>
+</div>
 {% endblock %}

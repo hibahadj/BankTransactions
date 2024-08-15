@@ -1,21 +1,50 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout, login
-from django.contrib.auth.decorators import login_required
+
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import csrf_protect
-from app1.models import Client, Admin, Compte
+from app1.models import Client, Admin, Compte, Transaction
 from django.contrib.auth.hashers import check_password, make_password
 
 from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.views import PasswordChangeView
+
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from .forms import ClientForm, CompteForm
-from django.http import JsonResponse
+
+from .forms import AdminForm, ClientForm, CompteForm, TransactionForm
+from django.http import JsonResponse, HttpResponse
+import csv
+
+
+def download_transactions(request, compte_num):
+    # Fetch all transactions for the specified account number
+    transactions = Transaction.objects.filter(compte__comptenum=compte_num)
+
+    # Create the HTTP response with CSV content type
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="transactions_{compte_num}.csv"'
+
+    # Create a CSV writer
+    writer = csv.writer(response)
+    
+    # Write the header row
+    writer.writerow(['Transaction ID', 'Client', 'Numéro du compte', 'Type', 'Montant', 'Date'])
+
+    # Write the transaction data to the CSV file
+    for transaction in transactions:
+        writer.writerow([
+            transaction.transactionid,                     # Column A
+            transaction.compte.client.clientusername,      # Column B
+            transaction.compte.comptenum,                  # Column C
+            transaction.transactiontype,                   # Column D
+            transaction.transactionmontant,                # Column E
+            transaction.transactiondate.strftime('%Y-%m-%d') # Column F (formatted date)
+        ])
+
+    return response
+
 
 
 
@@ -51,8 +80,8 @@ class SettingsView(TemplateView):
 class ClientSettingsView(TemplateView):
     template_name = 'settings_client.html'
 
-class ListeTransactionsView(TemplateView):
-    template_name = 'liste_transactions.html'
+#class ListeTransactionsView(TemplateView):
+ #   template_name = 'liste_transactions.html'
 
 class InfoPersonelsView(TemplateView):
     template_name = 'info_personels.html'
@@ -213,6 +242,7 @@ def CreateClient(request):
 
     # Proceed if the user is authenticated
     if request.method == 'POST':
+    
         clientnom = request.POST.get('clientnom')
         clientprenom = request.POST.get('clientprenom')
         clientemail = request.POST.get('clientemail')
@@ -234,10 +264,10 @@ def CreateClient(request):
         print(f"Client created with ID: {client.pk}")
         messages.success(request, "Client créer avec succès!")
         return redirect('clients')  # Redirection to the list of clients
-
+    
     print("Rendering CreateClient form")
     return render(request, 'create_client.html')  # Render a form for GET requests
-    
+ 
 
 def get_client_data(request, client_id):
     client = get_object_or_404(Client, clientid=client_id)
@@ -351,8 +381,9 @@ def create_account(request, client_id):
             return redirect('clients')
     else:
         form = CompteForm()
+    messages.error(request, 'Le Numéro du compte existe déjà!!.')
 
-    return render(request, 'create_account_modal.html', {'form': form, 'client': client})
+    return redirect('clients')
 
 #
 
@@ -370,3 +401,35 @@ def delete_account(request, compte_id):
         messages.error(request, 'Invalid request method. Please use POST.')
     
     return redirect('comptes')  # Redirige vers la page de liste des clients
+
+from django.views.decorators.http import require_POST
+
+#@require_POST
+def create_transaction(request, compte_id):
+    compte = get_object_or_404(Compte, compteid=compte_id)
+    form = TransactionForm(request.POST)
+
+    if form.is_valid():
+        transaction = form.save(commit=False)
+        transaction.compte = compte
+
+        try:
+            if transaction.transactiontype == 'Crédit':
+                compte.crediter_compte(transaction.transactionmontant)
+            elif transaction.transactiontype == 'Débit':
+                compte.debiter_compte(transaction.transactionmontant)
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect ('comptes')
+
+        messages.success(request, 'Transaction successfully completed!')
+        return redirect('comptes')
+    else:
+        # Output form errors for debugging
+        messages.error(request, 'Invalid form submission!!')
+        return redirect('comptes')
+
+class ListeTransactionsView(ListView):
+    model = Transaction
+    template_name = 'liste_transactions.html'
+    context_object_name = 'transactions'

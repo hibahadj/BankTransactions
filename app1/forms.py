@@ -1,5 +1,5 @@
 from django import forms
-from app1.models import Client, Admin ,Compte
+from app1.models import Client, Admin ,Compte, Transaction
 
 class ClientForm(forms.ModelForm):
     class Meta:
@@ -18,3 +18,8 @@ class CompteForm(forms.ModelForm):
         fields = ['comptesolde', 'comptenum', 'comptedevise']
         # You can include other fields as needed
         # Exclude fields that should not be editable in the form
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['transactiontype', 'transactionmontant']

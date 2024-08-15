@@ -19,7 +19,8 @@ from django.views.generic.base import RedirectView
 from django.urls import path
 from app1 import views
 from django.conf import settings
-from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password, client_change_password, ClientInfoPersonelsView, ClientSettingsView, ProposClientPage, delete_account
+from app1.views import ListeClientsView, ListeComptesView, ListeTransactionsView, InfoPersonelsView, SettingsView, delete_client, change_password, client_change_password, ClientInfoPersonelsView, ClientSettingsView, ProposClientPage, delete_account, create_transaction, download_transactions
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/login/', permanent=False), name='home_redirect'),  # Redirect to LOGIN_URL
@@ -42,8 +43,10 @@ urlpatterns = [
     path('edit_client/<int:client_id>/',views.edit_client, name='edit_client'),
     path('get_client_data/<int:client_id>/', views.get_client_data, name='get_client_data'),
     path('create_account/<int:client_id>/', views.create_account, name='create_account'),
+    path('create_transaction/<int:compte_id>/', create_transaction, name='create_transaction'),
     path('propos/', ProposClientPage, name='proposclient'),  
-    path('get_compte_data/<int:clientid>/', views.get_compte_data, name='get_compte_data'),
+    path('get_compte_data/<int:compteid>/', views.get_compte_data, name='get_compte_data'),
+    path('download_transactions/<str:compte_num>/', download_transactions, name='download_transactions'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

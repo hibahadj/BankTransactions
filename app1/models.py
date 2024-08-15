@@ -44,8 +44,8 @@ class Compte(models.Model):
     ]
     compteid = models.AutoField(primary_key=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
-    comptesolde = models.FloatField(unique=True, null=True, blank=True)
-    comptenum = models.CharField(max_length=255, null=True, blank=True)
+    comptesolde = models.FloatField(null=True, blank=True)
+    comptenum = models.CharField(max_length=255, unique=True, null=True, blank=True)
     comptedevise = models.CharField(max_length=10, choices=DEVICES_CHOICES, null=True, blank=True)
 
     def __str__(self):
