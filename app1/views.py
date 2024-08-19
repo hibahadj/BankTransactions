@@ -17,6 +17,13 @@ from .forms import AdminForm, ClientForm, CompteForm, TransactionForm
 from django.http import JsonResponse, HttpResponse
 import csv
 
+from django.shortcuts import render
+from django.db.models import Sum
+from datetime import datetime
+import calendar
+from .models import Client, Compte, Transaction
+
+
 
 def download_transactions(request, compte_num):
     # Fetch all transactions for the specified account number
@@ -436,16 +443,94 @@ class ListeTransactionsView(ListView):
 
 
 def dashboard_view(request):
+    # Statistiques
+    nb_clients = Client.objects.count()
+    nb_comptes = Compte.objects.count()
+    
+    # Initialiser les listes pour les mois et les montants
+    mois_labels = list(calendar.month_name[1:])
+    debits_par_mois = [0] * 12
+    credits_par_mois = [0] * 12
 
-    # Récupérer les statistiques
-    nombre_clients = Client.objects.count()
-    nombre_comptes = Compte.objects.count()
+    # Récupérer l'année en cours
+    annee_courante = datetime.now().year
+
+    # Obtenir les transactions pour l'année en cours
+    transactions = Transaction.objects.filter(transactiondate__year=annee_courante)
+
+    # Debugging: Afficher chaque transaction
+    for transaction in transactions:
+        print(f"Date: {transaction.transactiondate}, Type: {transaction.transactiontype}, Montant: {transaction.transactionmontant}")
+
+    # Calcul des débits et crédits par mois
+    for mois in range(1, 13):
+        mois_filter = transactions.filter(transactiondate__month=mois)
+        debits_par_mois[mois - 1] = mois_filter.filter(transactiontype='Débit').aggregate(total=Sum('transactionmontant'))['total'] or 0
+        credits_par_mois[mois - 1] = mois_filter.filter(transactiontype='Crédit').aggregate(total=Sum('transactionmontant'))['total'] or 0
+
+    # Debugging: Afficher les résultats après agrégation
+    print("Débits par Mois:", debits_par_mois)
+    print("Crédits par Mois:", credits_par_mois)
+
+    # Convertir les données en JSON
+    mois_labels_json = json.dumps(mois_labels)
+    debits_par_mois_json = json.dumps(debits_par_mois)
+    credits_par_mois_json = json.dumps(credits_par_mois)
 
     context = {
-        'nombre_clients': nombre_clients,
-        'nombre_comptes': nombre_comptes,
+        'nb_clients': nb_clients,
+        'nb_comptes': nb_comptes,
+        'mois_labels_json': mois_labels_json,
+        'debits_par_mois_json': debits_par_mois_json,
+        'credits_par_mois_json': credits_par_mois_json,
     }
     return render(request, 'dashboard.html', context)
+
+
+def dashboard_view(request):
+    # Statistiques
+    nb_clients = Client.objects.count()
+    nb_comptes = Compte.objects.count()
+    
+    # Initialiser les listes pour les mois et les montants
+    mois_labels = list(calendar.month_name[1:])  # ['January', 'February', ...]
+    debits_par_mois = [0] * 12
+    credits_par_mois = [0] * 12
+
+    # Récupérer l'année en cours
+    annee_courante = datetime.now().year
+
+    # Obtenir les transactions pour l'année en cours
+    transactions = Transaction.objects.filter(
+        transactiondate__year=annee_courante
+    )
+
+    # Calcul des débits et crédits par mois
+    for mois in range(1, 13):
+        mois_filter = transactions.filter(transactiondate__month=mois)
+        debits_par_mois[mois - 1] = mois_filter.filter(transactiontype='Débit').aggregate(total=Sum('transactionmontant'))['total'] or 0
+        credits_par_mois[mois - 1] = mois_filter.filter(transactiontype='Crédit').aggregate(total=Sum('transactionmontant'))['total'] or 0
+
+    # Debugging
+    print("Mois Labels:", mois_labels)
+    print("Débits par Mois:", debits_par_mois)
+    print("Crédits par Mois:", credits_par_mois)
+
+    # Convertir les données en JSON
+    mois_labels_json = json.dumps(mois_labels)
+    debits_par_mois_json = json.dumps(debits_par_mois)
+    credits_par_mois_json = json.dumps(credits_par_mois)
+
+    context = {
+        'nb_clients': nb_clients,
+        'nb_comptes': nb_comptes,
+        'mois_labels_json': mois_labels_json,
+        'debits_par_mois_json': debits_par_mois_json,
+        'credits_par_mois_json': credits_par_mois_json,
+    }
+    return render(request, 'dashboard.html', context)
+
+
 
 
 def dashboard_client(request):
