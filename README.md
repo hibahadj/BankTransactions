@@ -54,7 +54,7 @@ BankTransactions/
 ├── db.sqlite3  # SQLite database file
 ├── README.md  # Project documentation
 └── requirements.txt  # Python dependencies
-
+```
 ## Installation
 
 * **Clone the Repository**
@@ -79,3 +79,14 @@ BankTransactions/
 
 * **Access the Application**
     * Client and Admin Login: `http://127.0.0.1:8000/login/`
+ 
+## Contact
+
+For more information or to get in touch, you can reach us through the following:
+
+- **Email**: [hadjiedjhiba92@gmail.com](mailto:hadjiedjhiba92@gmail.com) or [akrabkamilia@gmail.com](mailto:akrabkamilia@gmail.com)
+
+Social media:
+
+- [GitHub](https://github.com/hibahadj)
+- [LinkedIn](https://www.linkedin.com/in/amel-hiba-hadjiedj)
