@@ -1,8 +1,8 @@
-# CPA Bank transactions Web App
+# Bank transactions Web App
 
 ## Overview
 
-BankTransactions is a web application designed for managing client accounts and transactions. It provides an intuitive interface for both administrators and clients, with functionalities such as clients and accounts management, transaction processing and history. The application ensures secure authentication and role-based access control.
+A web application designed for managing client accounts and transactions. It provides an intuitive interface for both administrators and clients, with functionalities such as clients and accounts management, transaction processing and history. The application ensures secure authentication and role-based access control.
 
 ## Features
 
