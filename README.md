@@ -27,7 +27,7 @@ A web application designed for managing client accounts and transactions. It pro
 ## Technologies Used
 
 - **Backend**: Django (Python)
-- **Frontend**: Bootstrap (HTML, CSS)
+- **Frontend**: HTML, CSS, JavaScript
 - **Database**: SQLite3
 - **Authentication**: Secure password hashing and verification using costum user authentification
 
