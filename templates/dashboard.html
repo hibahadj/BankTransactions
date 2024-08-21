@@ -11,7 +11,7 @@
             <i class="fas fa-users fa-3x mr-3 text-primary"></i>
             <div>
               <h5 class="card-title">Nombre de Clients</h5>
-              <p class="card-text">{{ nombre_clients }}</p>
+              <p class="card-text">{{ nb_clients }}</p>
             </div>
           </div>
         </div>
@@ -24,172 +24,60 @@
             <i class="fas fa-wallet fa-3x mr-3 text-success"></i>
             <div>
               <h5 class="card-title">Nombre de Comptes</h5>
-              <p class="card-text">{{ nombre_comptes }}</p>
+              <p class="card-text">{{ nb_comptes }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Graphique -->
-    <div class="row">
-      <div class="col-md-12 mb-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Graphique des transactions</h5>
-            <canvas id="myChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
-{% endblock %}
+    <div class="chart">
+        <canvas id="transactionChart"></canvas>
+    </div>
+</div>
 
-{% block extra_css %}
-<style>
-  /* Styles pour les cartes */
-  .card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-  }
-
-  .card-body {
-    padding: 20px;
-    display: flex;
-    align-items: center;
-  }
-
-  .card-title {
-    font-size: 1.25rem;
-    margin-bottom: 10px;
-    color: #11216f; /* Couleur de texte principale */
-  }
-
-  .card-text {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-  }
-
-  .text-primary {
-    color: #007bff;
-  }
-
-  .text-success {
-    color: #28a745;
-  }
-
-  .fa-users, .fa-wallet {
-    margin-right: 20px;
-  }
-
-  /* Ajouter une transition pour un effet au survol */
-  .card:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
-  #myChart {
-    height: 300px; /* Hauteur du graphique */
-  }
-</style>
-{% endblock %}
-
-{% block extra_js %}
+<!-- Charger le script Chart.js depuis un CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Exemple de données pour le graphique
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
+  // Récupérer les données JSON
+  const moisLabels = JSON.parse('{{ mois_labels_json|escapejs }}');
+  const debitData = JSON.parse('{{ debits_par_mois_json|escapejs }}');
+  const creditData = JSON.parse('{{ credits_par_mois_json|escapejs }}');
+
+  console.log('Mois Labels:', moisLabels);
+  console.log('Debit Data:', debitData);
+  console.log('Credit Data:', creditData);
+
+  // Créer le graphique
+  const ctx = document.getElementById('transactionChart').getContext('2d');
+  const transactionChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Compte 1', 'Compte 2', 'Compte 3', 'Compte 4'], // Labels des données
-        datasets: [{
-          label: 'Solde des Comptes',
-          data: [1200, 1500, 1800, 1300], // Données du graphique
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  });
-  
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-      type: 'bar', // Type de graphique (barres, lignes, etc.)
-      data: {
-        labels: ['Compte 1', 'Compte 2', 'Compte 3', 'Compte 4'], // Labels des données
-        datasets: [{
-          label: 'Solde des Comptes',
-          data: [1200, 1500, 1800, 1300], // Données du graphique
-          backgroundColor: 'rgba(54, 162, 235, 0.2)', // Couleur de fond des barres
-          borderColor: 'rgba(54, 162, 235, 1)', // Couleur de la bordure des barres
-          borderWidth: 1 // Largeur de la bordure
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            ticks: {
-              font: {
-                size: 14 // Taille de la police des labels de l'axe X
-              }
-            },
-            grid: {
-              display: false // Masquer la grille de l'axe X
-            }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: {
-              font: {
-                size: 14 // Taille de la police des labels de l'axe Y
+          labels: moisLabels,
+          datasets: [
+              {
+                  label: 'Crédit',
+                  data: creditData,
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
               },
-              stepSize: 500 // Pas des graduations sur l'axe Y
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.1)' // Couleur de la grille de l'axe Y
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top', // Position de la légende
-            labels: {
-              font: {
-                size: 14 // Taille de la police des labels de la légende
+              {
+                  label: 'Débit',
+                  data: debitData,
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  borderWidth: 1
               }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(tooltipItem) {
-                return tooltipItem.dataset.label + ': $' + tooltipItem.raw.toLocaleString(); // Formatage des tooltips
+          ]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: true
               }
-            }
           }
-        }
       }
-    });
   });
 </script>
-
-
 {% endblock %}
