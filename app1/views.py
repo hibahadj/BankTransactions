@@ -184,10 +184,10 @@ def LoginPage(request):
             # Redirect based on user type
             if isinstance(user, Admin):
                 print("User is an Admin. Redirecting to admin_home.")
-                return redirect('admin_home')
+                return redirect('dashboard')
             elif isinstance(user, Client):
                 print("User is a Client. Redirecting to client_home.")
-                return redirect('client_home')
+                return redirect('client_dashboard')
         else:
             print("Authentication failed")
             messages.error(request, "Username or Password is incorrect !!!")
