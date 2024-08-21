@@ -62,6 +62,21 @@ class Compte(models.Model):
         self.comptesolde -= transactionmontant
         self.save()
         Transaction.objects.create(compte=self, transactiontype='Débit', transactionmontant=transactionmontant)
+
+    def transferer_argent(self, montant, compte_destinataire):
+        # Check if the two accounts use the same currency
+        if self.comptedevise != compte_destinataire.comptedevise:
+            raise ValueError("Les comptes doivent avoir la même devise pour effectuer un transfert.")
+        
+        # Ensure the sender has sufficient funds
+        if montant > self.comptesolde:
+            raise ValueError("Solde insuffisant pour effectuer le transfert.")
+
+        # Debit the sender's account
+        self.debiter_compte(montant)
+        
+        # Credit the recipient's account
+        compte_destinataire.crediter_compte(montant)
     class Meta:
         db_table = 'Compte'
 class Transaction(models.Model):
@@ -71,6 +86,7 @@ class Transaction(models.Model):
     ]
     transactionid = models.AutoField(primary_key=True)
     compte = models.ForeignKey(Compte, on_delete=models.CASCADE, null=True)
+    destinataire_comptenum = models.CharField(max_length=255, null=True, blank=True) 
     transactiontype = models.CharField(max_length=10, choices=TYPE_TRANSACTION_CHOICES, null=True)
     transactionmontant = models.FloatField(null=True)
     transactiondate = models.DateTimeField(default=timezone.now, null=True)

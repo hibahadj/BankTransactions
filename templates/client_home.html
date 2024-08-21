@@ -257,8 +257,8 @@
       <div id="sidebar" class="sidebar">
         <a href="{% url 'client_dashboard'  %}" class="nav-link"> <i class="fa-solid fa-house"></i> Dashboard</a>
         <a href="{% url 'mescomptes'  %}" class="nav-link"> <i class="fa-solid fa-wallet"></i> Mes Comptes</a>
-        <a href="#" class="nav-link"> <i class="fa-solid fa-money-check-dollar"></i> Mes Transatctions</a>
-        <a href="#" class="nav-link"> <i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+        <a href="{% url 'transactionClient' %}" class="nav-link"> <i class="fa-solid fa-money-check-dollar"></i> Mes Transatctions</a>
+        
         <a href="{% url 'clientinfopersonels' %}" class="nav-link"> <i class="fa-solid fa-user"></i> Mes Informations</a>
         <a href="{% url 'clientsettings' %}" class="nav-link"> <i class="fa-solid fa-gear"></i> Paramètres</a>
         <a href="{% url 'proposclient' %}" class="nav-link"> <i class="fa-solid fa-circle-info"></i> À Propos</a>

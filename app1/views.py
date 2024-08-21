@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import csrf_protect
-from app1.models import Client, Admin, Compte,Transaction
+from app1.models import Client, Admin, Compte, Transaction
 from django.contrib.auth.hashers import check_password, make_password
 import json
 from django.shortcuts import get_object_or_404, redirect
@@ -16,6 +16,7 @@ from django.urls import reverse_lazy
 from .forms import AdminForm, ClientForm, CompteForm, TransactionForm
 from django.http import JsonResponse, HttpResponse
 import csv
+from django.urls import reverse
 
 
 def download_transactions(request, compte_num):
@@ -402,7 +403,7 @@ def delete_account(request, compte_id):
     
     return redirect('comptes')  # Redirige vers la page de liste des clients
 
-from django.views.decorators.http import require_POST
+
 
 #@require_POST
 def create_transaction(request, compte_id):
@@ -434,7 +435,28 @@ class ListeTransactionsView(ListView):
     template_name = 'liste_transactions.html'
     context_object_name = 'transactions'
 
+class ListeTransactionsClientView(ListView):
+    model = Transaction
+    template_name = 'transactions_client.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Use session-based authentication
+        if not request.session.get('is_authenticated'):
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Get the client ID from the session
+        client_id = self.request.session.get('user_id')
+        print(f"Client ID from session: {client_id}")  # Debugging statement
+        if client_id:
+            return Transaction.objects.filter(compte__client_id=client_id)
+        else:
+            return Transaction.objects.none() 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['transactions'] = self.get_queryset()
+        return context
 def dashboard_view(request):
 
     # Récupérer les statistiques
@@ -498,3 +520,33 @@ def mescomptes(request):
     except Client.DoesNotExist:
         # Gérer le cas où le client n'existe pas
         return redirect('login')
+    
+def transfer_funds(request):
+    if request.method == 'POST':
+        compte_num = request.POST.get('compte').strip()
+        destinataire_num = request.POST.get('destinataire').strip()
+        montant = float(request.POST.get('montant'))
+
+        print(f"Compte ID: {compte_num}, Destinataire Num: {destinataire_num}, Montant: {montant}")
+
+        try:
+            # Use 'comptenum' instead of 'pk' since the input is a string account number
+            compte = Compte.objects.get(comptenum=compte_num)
+            destinataire_compte = Compte.objects.get(comptenum=destinataire_num)
+
+            print(f"Found Compte: {compte.comptenum}, Found Destinataire Compte: {destinataire_compte.comptenum}")
+
+            compte.transferer_argent(montant, destinataire_compte)
+            messages.success(request, 'Transaction valide!!')
+            return redirect('transactionClient')
+        except Compte.DoesNotExist:
+            print("Either Compte or Destinataire Compte does not exist")
+            return JsonResponse({'success': False, 'error': 'Compte or destinataire does not exist'})
+        except ValueError as e:
+            print(f"ValueError: {str(e)}")
+            return JsonResponse({'success': False, 'error': str(e)})
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            return JsonResponse({'success': False, 'error': 'An unexpected error occurred: ' + str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})

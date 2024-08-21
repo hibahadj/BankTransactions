@@ -1,0 +1,292 @@
+{% extends 'client_home.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="header">
+    <h1>Mes Transactions</h1>
+    <button id="openNewTransactionModal" class="btn btn-create"> 
+      <i class="fa-solid fa-plus"></i> Nouvelle Transaction
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Recherche par ID, Num Compte ou Date" class="form-control search-bar">
+    <i class="fa fa-search search-icon"></i>
+  </div>
+
+  <!-- Tableau des comptes -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID Transaction</th>
+        <th>Numéro de mon compte</th>
+        <th>Username</th>
+        <th>Compte Destinataire</th>
+        <th>Devise</th>
+        <th>Type</th>
+        <th>Montant</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="transactionTableBody">
+      {% for transaction in transactions %}
+      <tr>
+        <td>{{ transaction.transactionid }}</td>
+        <td>{{ transaction.compte.comptenum }}</td>
+        <td>{{ transaction.compte.client.clientusername }}</td>
+        <td>{{ transaction.destinataire_comptenum }}</td>
+        <td>{{ transaction.compte.comptedevise }}</td>
+        <td>{{ transaction.transactiontype }}</td>
+        <td>{{ transaction.transactionmontant }}</td>
+        <td>{{ transaction.transactiondate }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal for New Transaction -->
+<div id="newTransactionModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Nouvelle Transaction</h3>
+    <form id="newTransactionForm">
+      <div class="form-group">
+        <label for="compte">Entrer le numéro de votre compte</label>
+        <input type="text" id="compte" name="compte" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="destinataire">Numéro de Compte Destinataire</label>
+        <input type="text" id="destinataire" name="destinataire" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="montant">Montant</label>
+        <input type="number" id="montant" name="montant" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Transférer</button>
+    </form>
+  </div>
+</div>
+
+
+{% if messages %}
+{% for message in messages %}
+    {% if message.tags == 'success' %}
+        <div class="success-dialogue">
+            <p>{{ message }}</p>
+        </div>
+    {% elif message.tags == 'error' %}
+        <div class="error-dialogue">
+            <p>{{ message }}</p>
+        </div>
+    {% endif %}
+{% endfor %}
+{% endif %}
+
+<style>
+  /* Styles pour la modale */
+  .modal {
+    display: none; /* Caché par défaut */
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px; /* Optionnel : définit une largeur maximale pour le modal */
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* Styles pour la disposition du header */
+  .header {
+    display: flex;
+    justify-content: space-between; /* Aligne le titre à gauche et le bouton à droite */
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    margin: 0;
+  }
+
+  /* Styles pour le formulaire */
+  form {
+    display: flex;
+    flex-direction: column; /* Aligne les éléments du formulaire en colonne */
+  }
+
+  label {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  input {
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .form-buttons {
+    display: flex;
+    justify-content: space-between; /* Aligne les boutons de soumission et d'annulation */
+    margin-top: 20px;
+  }
+
+
+
+  /* Styles pour les icônes d'action */
+  .action-icon {
+    text-decoration: none;
+    color: #333;
+    margin: 0 5px;
+    font-size: 1.2em;
+    display: inline-block; /* Assure que les icônes sont affichées correctement */
+  }
+
+  .action-icon:hover {
+   color: #007bff;
+  }
+
+  .search-container {
+    display: flex;
+    align-items: center; /* Aligns items vertically in the center */
+    position: relative; /* Allows absolute positioning of the icon */
+    width: 100%; /* Adjust as needed */
+    max-width: 400px; /* Adjust the max-width as needed */
+  }
+
+  .search-bar {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #11216f;
+    border-radius: 4px;
+    width: 100%;
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 10px;
+    top: 57%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #666;
+  }
+
+  .search-icon.hidden {
+    opacity: 0; /* Hide the icon */
+    pointer-events: none; /* Prevent clicking */
+  }
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var modal = document.getElementById("newTransactionModal");
+    var openModalBtn = document.getElementById("openNewTransactionModal");
+    var closeModalBtn = modal.querySelector(".close");
+    var isSubmitting = false;
+
+    openModalBtn.addEventListener("click", function() {
+        modal.style.display = "block";
+    });
+
+    closeModalBtn.addEventListener("click", function() {
+        modal.style.display = "none";
+    });
+
+    window.addEventListener("click", function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    var form = document.getElementById("newTransactionForm");
+    form.addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent normal form submission
+        if (isSubmitting) return;
+        isSubmitting = true;
+        var formData = new FormData(form);
+
+        fetch("{% url 'transfer_funds' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            isSubmitting = false;
+            console.log('Response data:', data); // Check the response
+
+            if (data.success) {
+                // Close the modal
+                modal.style.display = "none";
+
+                // Show success message
+                var successDialogue = document.createElement('div');
+                successDialogue.className = 'success-dialogue';
+                successDialogue.innerHTML = `<p>Transaction effectuée avec succès!</p>`;
+                document.body.appendChild(successDialogue);
+
+                // Remove success message after a few seconds
+                setTimeout(function() {
+                    successDialogue.remove();
+                }, 3000);
+
+                // Update the transaction table with the new transaction
+                var newRow = `
+                    <tr>
+                        <td>${data.transaction_id}</td>
+                        <td>${data.compte_num}</td>
+                        <td>${data.client_nom}</td>
+                        <td>${data.destinataire_comptenum}</td>
+                        <td>${data.devise}</td>
+                        <td>${data.type}</td>
+                        <td>${data.montant}</td>
+                        <td>${data.date}</td>
+                    </tr>
+                `;
+                document.getElementById("transactionTableBody").insertAdjacentHTML('beforeend', newRow);
+            } else {
+                // Handle errors here
+                alert(data.error || "An error occurred");
+            }
+        })
+        .catch(error => {
+            isSubmitting = false;
+            console.error("Error:", error);
+            alert("An unexpected error occurred.");
+        });
+    });
+});
+  </script>
+
+{% endblock %}
