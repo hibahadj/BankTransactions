@@ -44,6 +44,25 @@
       {% endfor %}
     </tbody>
   </table>
+  <div class="pagination-container">
+    <div class="pagination">
+        <span class="step-links">
+            {% if transactions.has_previous %}
+                <a href="?page=1" class="first-page">&laquo; Première</a>
+                <a href="?page={{ transactions.previous_page_number }}" class="prev-page">Précédente</a>
+            {% endif %}
+
+            <span class="current-page">
+                Page {{ transactions.number }} sur {{ transactions.paginator.num_pages }}
+            </span>
+
+            {% if transactions.has_next %}
+                <a href="?page={{ transactions.next_page_number }}" class="next-page">Suivante</a>
+                <a href="?page={{ transactions.paginator.num_pages }}" class="last-page">Dernière &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+  </div>
 </div>
 
 <!-- Modal for New Transaction -->
@@ -85,6 +104,46 @@
 {% endif %}
 
 <style>
+  .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+  }
+
+  .pagination {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .step-links a {
+      color: #030187;
+      text-decoration: none;
+      margin: 0 5px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      background-color: #e9ecef;
+      transition: background-color 0.3s ease;
+  }
+
+  .step-links a:hover {
+      background-color: #007bff;
+      color: #fff;
+  }
+
+  .current-page {
+      font-weight: bold;
+      margin: 0 10px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      background-color: #e9ecef;
+  }
+
+  .first-page, .prev-page, .next-page, .last-page {
+      font-weight: 600;
+  }
   /* Styles pour la modale */
   .modal {
     display: none; /* Caché par défaut */

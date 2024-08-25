@@ -23,8 +23,7 @@ from django.db.models import Sum
 from datetime import datetime
 import calendar
 from .models import Client, Compte, Transaction
-
-
+from django.core.paginator import Paginator
 
 def download_transactions(request, compte_num):
     # Fetch all transactions for the specified account number
@@ -441,10 +440,20 @@ class ListeTransactionsView(ListView):
     model = Transaction
     template_name = 'liste_transactions.html'
     context_object_name = 'transactions'
+    paginate_by = 5
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(self.get_queryset(), self.paginate_by)
+        page = self.request.GET.get('page')
+        transactions = paginator.get_page(page)
+        context['transactions'] = transactions
+        return context    
 
 class ListeTransactionsClientView(ListView):
     model = Transaction
     template_name = 'transactions_client.html'
+    paginate_by = 5
 
     def dispatch(self, request, *args, **kwargs):
         # Use session-based authentication
@@ -462,7 +471,10 @@ class ListeTransactionsClientView(ListView):
             return Transaction.objects.none() 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['transactions'] = self.get_queryset()
+        paginator = Paginator(self.get_queryset(), self.paginate_by)
+        page = self.request.GET.get('page')
+        transactions = paginator.get_page(page)
+        context['transactions'] = transactions
         return context
 def dashboard_view(request):
     # Statistiques
